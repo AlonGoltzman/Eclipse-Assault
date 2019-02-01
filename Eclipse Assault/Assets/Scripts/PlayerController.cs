@@ -110,7 +110,6 @@ namespace Controllers
             Position.x = Mathf.Clamp01(Position.x);
             if (Position.x >= 1)
             {
-                Debug.LogFormat("A: {0}, {1}.", Position);
                 TransformPosition.x = TransformPosition.x - 0.64f;
                 Position = Camera.main.WorldToViewportPoint(TransformPosition);
                 transform.position = Camera.main.ViewportToWorldPoint(Position);
@@ -124,7 +123,6 @@ namespace Controllers
                 Position.x = Mathf.Clamp01(Position.x);
                 if (Position.x <= 0)
                 {
-                    Debug.LogFormat("B: {0}.", Position);
                     TransformPosition.x = TransformPosition.x + 0.64f;
                     Position = Camera.main.WorldToViewportPoint(TransformPosition);
                     transform.position = Camera.main.ViewportToWorldPoint(Position);

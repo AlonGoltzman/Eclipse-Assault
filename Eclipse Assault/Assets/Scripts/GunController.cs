@@ -169,7 +169,7 @@ namespace Controllers
 #if !UNITY_ANDROID
      private void DoAction()
         {
-            if (Shoot && CanShoot)
+            if (CanShoot)
 
             {
                 var bullet = Instantiate(Bullet);

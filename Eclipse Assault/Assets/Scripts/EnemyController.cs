@@ -43,6 +43,11 @@ namespace Controllers
         /// </summary>
         private Transform ExitPoint;
 
+        /// <summary>
+        /// The wall at which this blimp will despawn.
+        /// </summary>
+        private GameObject DespawnWall;
+
         // Update is called once per frame
         void Start()
         {
@@ -61,6 +66,13 @@ namespace Controllers
         {
             if (RemainingCooldown > 0) RemainingCooldown -= Time.deltaTime;
             DoDropBomb();
+
+            if ((MovementSpeed < 0 && transform.position.x <= DespawnWall.transform.position.x) ||
+                (MovementSpeed > 0 && transform.position.x >= DespawnWall.transform.position.x))
+            {
+                Destroy(gameObject);
+            }
+       
         }
 
         /// <summary>
@@ -93,6 +105,16 @@ namespace Controllers
             {
                 gameObject.GetComponentInChildren<HealthBarController>().Hit(other.gameObject);
             }
+        }
+
+        public void SetSpeed(float speed)
+        {
+            MovementSpeed = speed;
+        }
+
+        public void SetDespawnWall(GameObject gameObject)
+        {
+            DespawnWall = gameObject;
         }
     }
 }

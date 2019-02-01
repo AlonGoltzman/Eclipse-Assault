@@ -43,3 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3577cc5ff1a57647bc27ad7552a1a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UnitsPerMovement: 0.0078125
+  TimeBetweenMovements: 0.025
+  AndroidButton: {fileID: 932978833013181955, guid: b6b5030708141834991da32c2c8b410f,
+    type: 3}
+  IOSButton: {fileID: 0}

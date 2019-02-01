@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3221192592711081725}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.84, y: 5.6, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3221192593808754650}
@@ -70,7 +70,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -946317625
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: -80
   m_Sprite: {fileID: 21300000, guid: 48f70ee23ce639f4b88e1e07529bad48, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -108,11 +108,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c09cc5be96fd964e9b40ef5238a0f6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MovementSpeed: 0.0078125
+  MovementSpeed: 0.015625
   TimeBetweenMovements: 0
-  BombCoolDownTime: 0.75
+  BombCoolDownTime: 2
   Bomb: {fileID: 961239145770748286, guid: 045ade5af92efd348b460032df568b8c, type: 3}
-  Damage: 0
+  Damage: 10
 --- !u!1 &3221192593813543286
 GameObject:
   m_ObjectHideFlags: 0
@@ -123,7 +123,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3221192593813543287}
   m_Layer: 0
-  m_Name: ExitPoint
+  m_Name: BombDropPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
