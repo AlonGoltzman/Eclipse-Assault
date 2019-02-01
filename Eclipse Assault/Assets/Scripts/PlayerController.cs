@@ -37,7 +37,6 @@ namespace Controllers
             Vector3 RightPointViewport = Camera.main.WorldToViewportPoint(RightPoint);
 
             SizeOfCharacterInViewportCoords = RightPointViewport.x - LeftPointViewport.x;
-
         }
 
         // Update is called once per frame
@@ -59,20 +58,26 @@ namespace Controllers
         /// </summary>
         private void DoInput()
         {
+
+#if UNITY_ANDROID
+            MoveRight = Input.acceleration.x  > 0.1;
+            MoveLeft = Input.acceleration.x < -0.1;
+#else
             MoveRight = Input.GetButton(GameConstants.BUTTON_MOVE_RIGHT);
             MoveLeft = Input.GetButton(GameConstants.BUTTON_MOVE_LEFT);
 
             //If move right and move left is enabled, disable the movement.
             if (MoveRight && MoveLeft)
                 MoveRight = MoveLeft = false;
+#endif
         }
+
 
         /// <summary>
         /// Performs actions requested in this frame (or relative frame).
         /// </summary>
         private void DoAction()
         {
-
             if (MoveRight)
                 transform.position = new Vector3(transform.position.x + MovementSpeed, transform.position.y, transform.position.z);
 

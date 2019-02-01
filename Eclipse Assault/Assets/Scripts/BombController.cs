@@ -68,9 +68,6 @@ namespace Controllers
         /// </summary>
         private void DoMovement()
         {
-            if (TimePastSinceBombDropped > 3)
-                Destroy(gameObject);
-
             transform.position = new Vector3(transform.position.x, transform.position.y - Speed, transform.position.z);
 
             Speed = Mathf.Lerp(MinSpeed, MaxSpeed, (TimePastSinceBombDropped / 3));
