@@ -18,6 +18,16 @@ namespace Mgmt
         public float TimeBetweenMovements;
 
         /// <summary>
+        /// An on-screen button for android.
+        /// </summary>
+        public GameObject AndroidButton;
+
+        /// <summary>
+        /// An on-screen button for IOS.
+        /// </summary>
+        public GameObject IOSButton;
+
+        /// <summary>
         /// The game manager instance.
         /// </summary>
         private static GameMgr _instance;
@@ -50,6 +60,11 @@ namespace Mgmt
             Bounds GroundBounds = GameObject.Find(GameConstants.NAME_GROUND).GetComponent<SpriteRenderer>().bounds;
             GameConstants.POSITION_Y_GROUND = (GroundBounds.center + GroundBounds.extents).y;
 
+#if UNITY_ANDROID
+            GameObject CameraContainer = GameObject.Find(GameConstants.NAME_CAMERA_CONTAINER);
+            Game Object NewAndroidButton = Instantiate(AndroidButton);
+            NewAndroidButton.transform.parent = CameraContainer.transform;
+#endif
 
             StartCoroutine("MoveMoveables");
         }
@@ -85,6 +100,7 @@ namespace Mgmt
         public static readonly string NAME_HEALTH_BAR_CONTAINER_SPIRTE = "BarSprite";
         public static readonly string NAME_GROUND = "Ground";
         public static readonly string NAME_ENEMY_BOMB_DROP_POINT = "BombDropPoint";
+        public static readonly string NAME_CAMERA_CONTAINER = "CameraContainer";
 
         public static readonly string TAG_MOVEABLES = "Moveables";
 
