@@ -68,7 +68,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -946317625
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: -60
   m_Sprite: {fileID: 21300000, guid: 1c08ef150d6c53f4391fcd4dc9a8f899, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6861038719269176609}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46775af4e44f47644992bf9599f9f5b1, type: 3}
+  m_Script: {fileID: 11500000, guid: 8fce7100e8f653c419e86425adf5d7ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 0

@@ -98,7 +98,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -946317625
-  m_SortingLayer: 1
+  m_SortingLayer: 2
   m_SortingOrder: 90
   m_Sprite: {fileID: 21300000, guid: b7409d605eb940347a2c147b66e8f481, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -120,9 +120,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7630329911968450130}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20ee99f559ed7ce44b6b69f3cf37ec9e, type: 3}
+  m_Script: {fileID: 11500000, guid: 15338cf336b42ca47a22e0447b1b3304, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Bullet: {fileID: 5002742567146259152, guid: 3948ca7c3f4761140a992e7e3186b79e, type: 3}
   Damage: 10
-  TimeBetweenShots: 0.5
+  TimeBetweenShots: 1

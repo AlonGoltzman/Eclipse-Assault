@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -29,6 +31,18 @@ namespace Controllers
         /// </summary>
         private float SizeOfCharacterInViewportCoords;
 
+#if UNITY_ANDROID
+        /// <summary>
+        /// Is the player holding the move right button.
+        /// </summary>
+        private bool HoldingMoveRight;
+
+        /// <summary>
+        /// Is the player holding the mvoe left button.
+        /// </summary>
+        private bool HoldingMoveLeft;
+#endif
+
         void Start()
         {
             Vector3 LeftPoint = new Vector3(-0.64f, 0);
@@ -37,6 +51,40 @@ namespace Controllers
             Vector3 RightPointViewport = Camera.main.WorldToViewportPoint(RightPoint);
 
             SizeOfCharacterInViewportCoords = RightPointViewport.x - LeftPointViewport.x;
+
+#if UNITY_ANDROID
+            //Movement triggers
+            EventTrigger MoveRight = GameObject.Find(GameConstants.UI_NAME_MOVE_RIGHT_BUTTON).GetComponent<EventTrigger>();
+            EventTrigger MoveLeft = GameObject.Find(GameConstants.UI_NAME_MOVE_LEFT_BUTTON).GetComponent<EventTrigger>();
+
+            EventTrigger.Entry startMoveLeftEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerDown
+            };
+            startMoveLeftEntry.callback.AddListener(StartMoveLeft);
+            EventTrigger.Entry startMoveRightEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerDown
+            };
+            startMoveRightEntry.callback.AddListener(StartMoveRight);
+
+            EventTrigger.Entry stopMoveLeftEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerUp
+            };
+            stopMoveLeftEntry.callback.AddListener(StopMoveLeft);
+            EventTrigger.Entry stopMoveRightEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerUp
+            };
+            stopMoveRightEntry.callback.AddListener(StopMoveRight);
+
+
+            MoveLeft.triggers.Add(startMoveLeftEntry);
+            MoveLeft.triggers.Add(stopMoveLeftEntry);
+            MoveRight.triggers.Add(startMoveRightEntry);
+            MoveRight.triggers.Add(stopMoveRightEntry);
+#endif
         }
 
         // Update is called once per frame
@@ -60,8 +108,15 @@ namespace Controllers
         {
 
 #if UNITY_ANDROID
-            MoveRight = Input.acceleration.x  > 0.1;
-            MoveLeft = Input.acceleration.x < -0.1;
+            if (!GameMgr.SwipeControl)
+            {
+                MoveRight = Input.acceleration.x > 0.1;
+                MoveLeft = Input.acceleration.x < -0.1;
+            } else
+            {
+                MoveRight = HoldingMoveRight;
+                MoveLeft = HoldingMoveLeft;
+            }
 #else
             MoveRight = Input.GetButton(GameConstants.BUTTON_MOVE_RIGHT);
             MoveLeft = Input.GetButton(GameConstants.BUTTON_MOVE_LEFT);
@@ -137,5 +192,45 @@ namespace Controllers
 
             }
         }
-    }
+
+#if UNITY_ANDROID
+        /// <summary>
+        /// Indicate that the play should move right.
+        /// </summary>
+        public void StartMoveRight(BaseEventData data)
+        {
+#if !UNITY_EDITOR
+            if(GameMgr.SwipeControl)
+#endif
+            HoldingMoveRight = true;
+        }
+
+        /// <summary>
+        /// Indicate that the play should move right.
+        /// </summary>
+        public void StartMoveLeft(BaseEventData data)
+        {
+#if !UNITY_EDITOR
+            if (GameMgr.SwipeControl)
+#endif
+            HoldingMoveLeft = true;
+        }
+
+        public void StopMoveLeft(BaseEventData data)
+        {
+#if !UNITY_EDITOR
+            if(GameMgr.SwipeControl)
+#endif
+            HoldingMoveLeft = false;
+        }
+
+        public void StopMoveRight(BaseEventData data)
+        {
+#if !UNITY_EDITOR
+            if(GameMgr.SwipeControl)
+#endif 
+            HoldingMoveRight = false;
+        }
+#endif
+        }
 }

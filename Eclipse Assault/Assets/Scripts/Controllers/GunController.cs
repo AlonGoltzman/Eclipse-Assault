@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.EventSystems;
 
 namespace Controllers
 {
@@ -24,8 +24,6 @@ namespace Controllers
         /// </summary>
         public float TimeBetweenShots;
 
-#if UNITY_ANDROID
-
         /// <summary>
         /// Has a touch began on the screen.
         /// </summary>
@@ -46,15 +44,6 @@ namespace Controllers
         /// </summary>
         private float ScreenWidth;
 
-#else
-        /// <summary>
-        /// Should the gun shoot in this stage.
-        /// </summary>
-        private bool Shoot = false;
-#endif
-
-
-
         /// <summary>
         /// Can the character shoot.
         /// </summary>
@@ -70,11 +59,61 @@ namespace Controllers
         /// </summary>
         private Transform ExitPoint;
 
+#if UNITY_ANDROID
+        /// <summary>
+        /// Should the weapon be rotating left?
+        /// </summary>
+        private bool RotateLeft;
+
+        /// <summary>
+        /// Should the weapon be rotating right?
+        /// </summary>
+        private bool RotateRight;
+
+        /// <summary>
+        /// The angle at which the weapon's rotation changes.
+        /// </summary>
+        private float AngleChange = 1f;
+#endif
+
         void Start()
         {
             ExitPoint = transform.GetChild(0);
 #if UNITY_ANDROID
             ScreenWidth = Screen.width;
+
+            EventTrigger AngleRight = GameObject.Find(GameConstants.UI_NAME_ANGLE_RIGHT_BUTTON).GetComponent<EventTrigger>();
+            EventTrigger AngleLeft = GameObject.Find(GameConstants.UI_NAME_ANGLE_LEFT_BUTTON).GetComponent<EventTrigger>();
+
+            EventTrigger.Entry startRotateLeftEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerDown
+            };
+            startRotateLeftEntry.callback.AddListener(StartRotateLeft);
+            EventTrigger.Entry startRotateRightEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerDown
+            };
+            startRotateRightEntry.callback.AddListener(StartRotateRight);
+
+            EventTrigger.Entry stopRotateLeftEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerUp
+            };
+            stopRotateLeftEntry.callback.AddListener(StopRotateLeft);
+            EventTrigger.Entry stopRotateRightEntry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerUp
+            };
+            stopRotateRightEntry.callback.AddListener(StopRotateRight);
+
+
+            AngleLeft.triggers.Add(startRotateLeftEntry);
+            AngleLeft.triggers.Add(stopRotateLeftEntry);
+            AngleRight.triggers.Add(startRotateRightEntry);
+            AngleRight.triggers.Add(stopRotateRightEntry);
+
+
 #endif
         }
 
@@ -83,10 +122,7 @@ namespace Controllers
         {
             FollowCursor();
 
-            DoInput();
-#if !UNITY_ANDROID
             DoAction();
-#endif
         }
 
         /// <summary>
@@ -97,48 +133,58 @@ namespace Controllers
 
 
 #if UNITY_ANDROID
-            if (Input.touchCount > 0)
+
+            if (!GameMgr.SwipeControl)
             {
-                Touch PlayerTouch = Input.touches[0];
-                if (PlayerTouch.phase == TouchPhase.Began && TouchOrigin.x < 0)
+                if (Input.touchCount > 0)
                 {
-                    TouchOrigin = PlayerTouch.position;
+                    Touch PlayerTouch = Input.touches[0];
+                    if (PlayerTouch.phase == TouchPhase.Began && TouchOrigin.x < 0)
+                    {
+                        TouchOrigin = PlayerTouch.position;
+                    }
+                    else if (PlayerTouch.phase == TouchPhase.Ended && TouchOrigin.x <= 0)
+                    {
+                        TouchOrigin = -Vector2.one;
+                        CurrentTouchPosition = -Vector2.one;
+                    }
+                    else if (PlayerTouch.phase == TouchPhase.Moved)
+                    {
+                        CurrentTouchPosition = PlayerTouch.position;
+                    }
                 }
-                else if (PlayerTouch.phase == TouchPhase.Ended && TouchOrigin.x <= 0)
+                else
                 {
                     TouchOrigin = -Vector2.one;
                     CurrentTouchPosition = -Vector2.one;
                 }
-                else if (PlayerTouch.phase == TouchPhase.Moved)
+
+                if (CurrentTouchPosition.x > 0 && TouchOrigin.x > 0)
                 {
-                    CurrentTouchPosition = PlayerTouch.position;
+                    float XDelta = CurrentTouchPosition.x - TouchOrigin.x;
+
+                    float ratio = Mathf.Abs(XDelta) / ScreenWidth;
+
+                    float AngleChange = ratio * 180;
+
+                    AngleChange *= XDelta < 0 ? 1 : -1;
+
+                    if (CurrentAngle + AngleChange < 0)
+                        CurrentAngle = 0;
+                    else if (CurrentAngle + AngleChange > 180)
+                        CurrentAngle = 180;
+                    else
+                        CurrentAngle += AngleChange;
+
+                    TouchOrigin = CurrentTouchPosition;
+                    //Debug.LogFormat("Delta: {0}, Ratio: {1}, Angle Change: {2}, Current Angle: {3}.", XDelta, ratio, AngleChange, CurrentAngle);
+                    transform.rotation = Quaternion.AngleAxis(CurrentAngle, Vector3.forward);
                 }
-            }
-            else
+            } else
             {
-                TouchOrigin = -Vector2.one;
-                CurrentTouchPosition = -Vector2.one;
-            }
-
-            if (CurrentTouchPosition.x > 0 && TouchOrigin.x > 0)
-            {
-                float XDelta = CurrentTouchPosition.x - TouchOrigin.x;
-
-                float ratio = Mathf.Abs(XDelta) / ScreenWidth;
-
-                float AngleChange = ratio * 180;
-
-                AngleChange *= XDelta < 0 ? 1 : -1;
-
-                if (CurrentAngle + AngleChange < 0)
-                    CurrentAngle = 0;
-                else if (CurrentAngle + AngleChange > 180)
-                    CurrentAngle = 180;
-                else
-                    CurrentAngle += AngleChange;
-
-                TouchOrigin = CurrentTouchPosition;
-                //Debug.LogFormat("Delta: {0}, Ratio: {1}, Angle Change: {2}, Current Angle: {3}.", XDelta, ratio, AngleChange, CurrentAngle);
+                CurrentAngle += RotateLeft ? AngleChange : (RotateRight ? -1 * AngleChange : 0);
+                if (CurrentAngle < 0) CurrentAngle = 0;
+                if (CurrentAngle > 180) CurrentAngle = 180;
                 transform.rotation = Quaternion.AngleAxis(CurrentAngle, Vector3.forward);
             }
 #else
@@ -147,27 +193,16 @@ namespace Controllers
             CurrentAngle = Mathf.Atan2(PositionDelta.y, PositionDelta.x) * Mathf.Rad2Deg;
             if (CurrentAngle > 180 || CurrentAngle < -90)
                 CurrentAngle = 180;
-            if(CurrentAngle < 0 && CurrentAngle >= -90)
+            if (CurrentAngle < 0 && CurrentAngle >= -90)
                 CurrentAngle = 0;
             transform.rotation = Quaternion.AngleAxis(CurrentAngle, Vector3.forward);
 #endif
         }
 
         /// <summary>
-        /// Reads input from the user.
-        /// </summary>
-        public void DoInput()
-        {
-#if !UNITY_ANDROID
-            Shoot = Input.GetButtonUp(GameConstants.BUTTON_SHOOT);
-#endif
-        }
-
-        /// <summary>
         /// Performs the action if needed.
         /// </summary>
-#if !UNITY_ANDROID
-     private void DoAction()
+        private void DoAction()
         {
             if (CanShoot)
 
@@ -186,32 +221,7 @@ namespace Controllers
                 CanShoot = false;
                 StartCoroutine("WaitForAbilityToShoot");
             }
-            Shoot = false;
         }
-#else
-        public void Fire()
-        {
-            if (CanShoot)
-            {
-                var bullet = Instantiate(Bullet);
-
-                bullet.name = GameConstants.NAME_BULLET_PLAYER + GameStatistics.BulletsShot;
-                GameStatistics.BulletsShot++;
-
-                bullet.transform.position = ExitPoint.position;
-                bullet.transform.rotation = transform.rotation;
-
-                bullet.GetComponent<BulletController>().SetAngle(CurrentAngle);
-                bullet.GetComponent<BulletController>().SetDamage(Damage);
-
-                CanShoot = false;
-                StartCoroutine("WaitForAbilityToShoot");
-            }
-        }
-#endif
-
-
-
 
         private IEnumerator WaitForAbilityToShoot()
         {
@@ -219,6 +229,45 @@ namespace Controllers
             CanShoot = true;
             yield break;
         }
+
+#if UNITY_ANDROID
+
+        /// <summary>
+        /// Starts  rotating the weapon to the left.
+        /// </summary>
+        private void StartRotateRight(BaseEventData data)
+        {
+            RotateRight = true;
+            if (RotateLeft && RotateRight)
+                RotateLeft = RotateRight = false;
+        }
+
+        /// <summary>
+        /// Starts rotating the weapon to the right.
+        /// </summary>
+        private void StartRotateLeft(BaseEventData data)
+        {
+            RotateLeft = true;
+            if (RotateLeft && RotateRight)
+                RotateLeft = RotateRight = false;
+        }
+        
+        /// <summary>
+        /// Stops the weapon from rotating right.
+        /// </summary>
+        private void StopRotateRight(BaseEventData data)
+        {
+            RotateRight = false;
+        }
+
+        /// <summary>
+        /// Stops the wepaon from rotating left.
+        /// </summary>
+        private void StopRotateLeft(BaseEventData data)
+        {
+            RotateLeft = false;
+        }
+#endif
     }
 
 }

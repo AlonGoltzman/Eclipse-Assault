@@ -17,19 +17,6 @@ namespace Controllers
             get { return ProjectileDamage; }
         }
 
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
-
         public void SetDamage(float Damage)
         {
             ProjectileDamage = Damage;
