@@ -69,7 +69,7 @@ namespace Mgmt
         /// Is swipe control enabled.
         /// </summary>
         [HideInInspector]
-        public static bool SwipeControl;
+        public static bool TiltControl;
 
         /// <summary>
         /// Has the level changed in the prepare method.
@@ -94,7 +94,7 @@ namespace Mgmt
 
         void OnEnable()
         {
-            SceneManager.sceneLoaded += OnSceneLoaded;    
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         void Update()
@@ -115,7 +115,7 @@ namespace Mgmt
 
                 float Y = Random.Range(SpawnWall.transform.position.y, SpawnWall.transform.position.y + 1);
 
-                float TimeBetweenBombDrop = Random.Range(2, 6);
+                float TimeBetweenBombDrop = Random.Range(1, 4);
 
                 NewEnemy.name = GameConstants.NAME_ENEMY + GameStatistics.EnemiesCreated++;
                 NewEnemy.transform.position = new Vector3(SpawnWall.transform.position.x + UnitsPerMovement * 3 * (Left ? 1 : -1), Y, 0);
@@ -171,19 +171,11 @@ namespace Mgmt
                 Destroy(GameObject.Find(GameConstants.UI_NAME_SWIPE_CONTROL));
 #endif
                 Toggle toggle = GameObject.Find(GameConstants.UI_NAME_SWIPE_CONTROL).GetComponent<Toggle>();
-                SwipeControl = toggle.isOn;
+                TiltControl = toggle.isOn;
             }
             if (Arena)
             {
-                GradientColorKey[] CKeys = new GradientColorKey[3];
-                CKeys[0] = GameConstants.RED;
-                CKeys[1] = GameConstants.YELLOW;
-                CKeys[2] = GameConstants.GREEN;
-
-                GradientAlphaKey[] AKeys = new GradientAlphaKey[3];
-                AKeys[0] = AKeys[1] = AKeys[2] = GameConstants.ALPHA;
-
-                GameConstants.HEALTH_BAR_GRADIENT.SetKeys(CKeys, AKeys);
+                DefineHealthGradient();
 
                 Bounds GroundBounds = GameObject.Find(GameConstants.NAME_GROUND).GetComponent<SpriteRenderer>().bounds;
                 GameConstants.POSITION_Y_GROUND = (GroundBounds.center + GroundBounds.extents).y;
@@ -196,14 +188,8 @@ namespace Mgmt
                     EnemyWalls[1] = tmp;
                 }
 
-
-#if UNITY_ANDROID
-            if(SwipeControl){
-                GameObject CameraContainer = GameObject.Find(GameConstants.NAME_CAMERA_CONTAINER);
-                GameObject NewAndroidButton = Instantiate(AndroidButton);
-                NewAndroidButton.transform.SetParent(CameraContainer.transform);
-            }
-#endif
+                EnemyWalls[0].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(-0.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
+                EnemyWalls[1].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(1.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
 
                 StartCoroutine("MoveMoveables");
             }
@@ -211,7 +197,20 @@ namespace Mgmt
 
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Prepare();    
+            Prepare();
+        }
+
+        private void DefineHealthGradient()
+        {
+            GradientColorKey[] CKeys = new GradientColorKey[3];
+            CKeys[0] = GameConstants.RED;
+            CKeys[1] = GameConstants.YELLOW;
+            CKeys[2] = GameConstants.GREEN;
+
+            GradientAlphaKey[] AKeys = new GradientAlphaKey[3];
+            AKeys[0] = AKeys[1] = AKeys[2] = GameConstants.ALPHA;
+
+            GameConstants.HEALTH_BAR_GRADIENT.SetKeys(CKeys, AKeys);
         }
 
         /// <summary>
@@ -219,14 +218,19 @@ namespace Mgmt
         /// </summary>
         public void Play()
         {
+            Debug.Log("Starting Play.");
             if (Menu)
+            {
                 SceneManager.LoadScene(GameConstants.LEVEL_NAME_ARENA, LoadSceneMode.Single);
+                return;
+            }
+            Debug.Log("Not loading play as it is not menu.");
         }
 
         public void ToggleSwipeControls()
         {
             if (!Menu) return;
-            SwipeControl = !SwipeControl;
+            TiltControl = !TiltControl;
         }
     }
 
@@ -246,6 +250,7 @@ namespace Mgmt
         public static readonly string NAME_ENEMY_BOMB_DROP_POINT = "BombDropPoint";
         public static readonly string NAME_CAMERA_CONTAINER = "CameraContainer";
         public static readonly string NAME_ENEMY_SPAWN = "EnemyWall";
+        public static readonly string NAME_ENEMY_SPAWN_CONTAINER = "EnemySpawnContainer";
 
         public static readonly string LEVEL_NAME_MENU = "Menu";
         public static readonly string LEVEL_NAME_ARENA = "Arena";
@@ -274,6 +279,9 @@ namespace Mgmt
         public static readonly float PIXELS_PER_UNIT = 100f;
 
         public static float POSITION_Y_GROUND;
+
+        public static float X_MIDDLE_OF_SCREEN = Screen.width / 2;
+        public static float Y_MIDDLE_OF_SCREEN = Screen.height / 2;
     }
 
     public static class GameStatistics
@@ -287,6 +295,11 @@ namespace Mgmt
         /// The number of enemies created in this level.
         /// </summary>
         public static int EnemiesCreated = 0;
+
+        /// <summary>
+        /// The number of enemies destroyed.
+        /// </summary>
+        public static int EnemiesDestroyed = 0;
     }
 }
 

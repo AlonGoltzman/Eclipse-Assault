@@ -217,6 +217,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5002742567146259152, guid: 3948ca7c3f4761140a992e7e3186b79e,
         type: 3}
+    - target: {fileID: 7630329911968450143, guid: 4d376c976e591274a9fe0d1512d6867d,
+        type: 3}
+      propertyPath: AngleChange
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d376c976e591274a9fe0d1512d6867d, type: 3}
 --- !u!4 &9079828319458417472 stripped

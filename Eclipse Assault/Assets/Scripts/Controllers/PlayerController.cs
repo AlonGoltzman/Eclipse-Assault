@@ -33,15 +33,11 @@ namespace Controllers
 
 #if UNITY_ANDROID
         /// <summary>
-        /// Is the player holding the move right button.
+        /// The touch on the screen used to move the player.
+        /// Used for non-tilt controls.
         /// </summary>
-        private bool HoldingMoveRight;
-
-        /// <summary>
-        /// Is the player holding the mvoe left button.
-        /// </summary>
-        private bool HoldingMoveLeft;
-#endif
+        private Vector2 MoveTouch = -Vector2.one;
+#endif 
 
         void Start()
         {
@@ -51,40 +47,6 @@ namespace Controllers
             Vector3 RightPointViewport = Camera.main.WorldToViewportPoint(RightPoint);
 
             SizeOfCharacterInViewportCoords = RightPointViewport.x - LeftPointViewport.x;
-
-#if UNITY_ANDROID
-            //Movement triggers
-            EventTrigger MoveRight = GameObject.Find(GameConstants.UI_NAME_MOVE_RIGHT_BUTTON).GetComponent<EventTrigger>();
-            EventTrigger MoveLeft = GameObject.Find(GameConstants.UI_NAME_MOVE_LEFT_BUTTON).GetComponent<EventTrigger>();
-
-            EventTrigger.Entry startMoveLeftEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerDown
-            };
-            startMoveLeftEntry.callback.AddListener(StartMoveLeft);
-            EventTrigger.Entry startMoveRightEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerDown
-            };
-            startMoveRightEntry.callback.AddListener(StartMoveRight);
-
-            EventTrigger.Entry stopMoveLeftEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerUp
-            };
-            stopMoveLeftEntry.callback.AddListener(StopMoveLeft);
-            EventTrigger.Entry stopMoveRightEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerUp
-            };
-            stopMoveRightEntry.callback.AddListener(StopMoveRight);
-
-
-            MoveLeft.triggers.Add(startMoveLeftEntry);
-            MoveLeft.triggers.Add(stopMoveLeftEntry);
-            MoveRight.triggers.Add(startMoveRightEntry);
-            MoveRight.triggers.Add(stopMoveRightEntry);
-#endif
         }
 
         // Update is called once per frame
@@ -95,7 +57,6 @@ namespace Controllers
             ValidateMovementLimits();
 
             DoAction();
-
         }
 
 
@@ -108,14 +69,38 @@ namespace Controllers
         {
 
 #if UNITY_ANDROID
-            if (!GameMgr.SwipeControl)
+            if (!GameMgr.TiltControl)
             {
                 MoveRight = Input.acceleration.x > 0.1;
                 MoveLeft = Input.acceleration.x < -0.1;
-            } else
+            }
+            else if (Input.touchCount > 0)
             {
-                MoveRight = HoldingMoveRight;
-                MoveLeft = HoldingMoveLeft;
+                for (int i = 0; i < Input.touchCount; i++)
+                {
+                    Touch touch = Input.touches[i];
+
+                    if (touch.position.y < GameConstants.Y_MIDDLE_OF_SCREEN)
+                    {
+                        if (MoveTouch.x < 0)
+                        {
+                            MoveTouch = touch.position;
+                        }
+                        else
+                        {
+                            MoveTouch = -Vector2.one;
+                            break;
+                        }
+                    }
+                }
+
+                if (MoveTouch.x > 0)
+                {
+                    MoveRight = MoveTouch.x > GameConstants.X_MIDDLE_OF_SCREEN;
+                    MoveLeft = MoveTouch.x <= GameConstants.X_MIDDLE_OF_SCREEN;
+                    MoveTouch = -Vector2.one;
+                }
+
             }
 #else
             MoveRight = Input.GetButton(GameConstants.BUTTON_MOVE_RIGHT);
@@ -133,11 +118,19 @@ namespace Controllers
         /// </summary>
         private void DoAction()
         {
+#if UNITY_ANDROID
             if (MoveRight)
                 transform.position = new Vector3(transform.position.x + MovementSpeed, transform.position.y, transform.position.z);
 
             if (MoveLeft)
                 transform.position = new Vector3(transform.position.x - MovementSpeed, transform.position.y, transform.position.z);
+#else 
+            if (MoveRight)
+                transform.position = new Vector3(transform.position.x + MovementSpeed, transform.position.y, transform.position.z);
+
+            if (MoveLeft)
+                transform.position = new Vector3(transform.position.x - MovementSpeed, transform.position.y, transform.position.z);
+#endif 
 
             //Reset all variables to false.
             MoveLeft = MoveRight = false;
@@ -192,45 +185,5 @@ namespace Controllers
 
             }
         }
-
-#if UNITY_ANDROID
-        /// <summary>
-        /// Indicate that the play should move right.
-        /// </summary>
-        public void StartMoveRight(BaseEventData data)
-        {
-#if !UNITY_EDITOR
-            if(GameMgr.SwipeControl)
-#endif
-            HoldingMoveRight = true;
-        }
-
-        /// <summary>
-        /// Indicate that the play should move right.
-        /// </summary>
-        public void StartMoveLeft(BaseEventData data)
-        {
-#if !UNITY_EDITOR
-            if (GameMgr.SwipeControl)
-#endif
-            HoldingMoveLeft = true;
-        }
-
-        public void StopMoveLeft(BaseEventData data)
-        {
-#if !UNITY_EDITOR
-            if(GameMgr.SwipeControl)
-#endif
-            HoldingMoveLeft = false;
-        }
-
-        public void StopMoveRight(BaseEventData data)
-        {
-#if !UNITY_EDITOR
-            if(GameMgr.SwipeControl)
-#endif 
-            HoldingMoveRight = false;
-        }
-#endif
-        }
+    }
 }

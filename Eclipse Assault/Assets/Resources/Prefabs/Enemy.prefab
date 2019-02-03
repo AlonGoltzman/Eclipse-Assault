@@ -31,7 +31,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3221192593813543287}
-  - {fileID: 7196900576907352889}
+  - {fileID: 2773658991320379979}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -112,7 +112,7 @@ MonoBehaviour:
   TimeBetweenMovements: 0
   BombCoolDownTime: 0
   Bomb: {fileID: 961239145770748286, guid: 045ade5af92efd348b460032df568b8c, type: 3}
-  Damage: 0
+  Damage: 10
 --- !u!1 &3221192593813543286
 GameObject:
   m_ObjectHideFlags: 0
@@ -212,11 +212,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1276627379, guid: b050e89d86d025c43b9ee23fe62a0964, type: 3}
       propertyPath: HP
-      value: 100
+      value: 50
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b050e89d86d025c43b9ee23fe62a0964, type: 3}
---- !u!4 &7196900576907352889 stripped
+--- !u!4 &2773658991320379979 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5016590906072361335, guid: b050e89d86d025c43b9ee23fe62a0964,
     type: 3}

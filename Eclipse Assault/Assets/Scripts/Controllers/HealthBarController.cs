@@ -3,6 +3,7 @@ using Mgmt;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Controllers
 {
@@ -62,7 +63,17 @@ namespace Controllers
             HealthBarSprite.GetComponent<SpriteRenderer>().color = GameConstants.HEALTH_BAR_GRADIENT.Evaluate(LeftHPPercent);
 
             if (HP <= 0)
+            {
+                if (transform.parent.gameObject.name.Contains(GameConstants.NAME_ENEMY))
+                {
+                    GameStatistics.EnemiesDestroyed++;
+                }
+                if (transform.parent.gameObject.name.Equals(GameConstants.NAME_PLAYER))
+                {
+                    SceneManager.LoadScene(GameConstants.LEVEL_NAME_MENU, LoadSceneMode.Single);
+                }
                 Destroy(transform.parent.gameObject);
+            }
         }
     }
 }

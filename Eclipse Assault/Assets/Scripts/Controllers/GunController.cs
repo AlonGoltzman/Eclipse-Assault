@@ -30,21 +30,6 @@ namespace Controllers
         private bool TouchStarted;
 
         /// <summary>
-        /// The origin of the touch.
-        /// </summary>
-        private Vector2 TouchOrigin = -Vector2.one;
-
-        /// <summary>
-        /// The current position of the player's finger.
-        /// </summary>
-        private Vector2 CurrentTouchPosition = -Vector2.one;
-
-        /// <summary>
-        /// The player's scren width.
-        /// </summary>
-        private float ScreenWidth;
-
-        /// <summary>
         /// Can the character shoot.
         /// </summary>
         private bool CanShoot = true;
@@ -61,6 +46,22 @@ namespace Controllers
 
 #if UNITY_ANDROID
         /// <summary>
+        /// The origin of the touch.
+        /// </summary>
+        private Vector2 TouchOrigin = -Vector2.one;
+
+        /// <summary>
+        /// The current position of the player's finger.
+        /// </summary>
+        private Vector2 CurrentTouchPosition = -Vector2.one;
+
+        /// <summary>
+        /// The touch on the screen used to angle the weapon.
+        /// Used for non-tlit controls.
+        /// </summary>
+        private Vector2 AngleTouch = -Vector2.one;
+
+        /// <summary>
         /// Should the weapon be rotating left?
         /// </summary>
         private bool RotateLeft;
@@ -73,48 +74,13 @@ namespace Controllers
         /// <summary>
         /// The angle at which the weapon's rotation changes.
         /// </summary>
-        private float AngleChange = 1f;
+        public float AngleChange;
 #endif
 
         void Start()
         {
             ExitPoint = transform.GetChild(0);
-#if UNITY_ANDROID
-            ScreenWidth = Screen.width;
 
-            EventTrigger AngleRight = GameObject.Find(GameConstants.UI_NAME_ANGLE_RIGHT_BUTTON).GetComponent<EventTrigger>();
-            EventTrigger AngleLeft = GameObject.Find(GameConstants.UI_NAME_ANGLE_LEFT_BUTTON).GetComponent<EventTrigger>();
-
-            EventTrigger.Entry startRotateLeftEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerDown
-            };
-            startRotateLeftEntry.callback.AddListener(StartRotateLeft);
-            EventTrigger.Entry startRotateRightEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerDown
-            };
-            startRotateRightEntry.callback.AddListener(StartRotateRight);
-
-            EventTrigger.Entry stopRotateLeftEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerUp
-            };
-            stopRotateLeftEntry.callback.AddListener(StopRotateLeft);
-            EventTrigger.Entry stopRotateRightEntry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerUp
-            };
-            stopRotateRightEntry.callback.AddListener(StopRotateRight);
-
-
-            AngleLeft.triggers.Add(startRotateLeftEntry);
-            AngleLeft.triggers.Add(stopRotateLeftEntry);
-            AngleRight.triggers.Add(startRotateRightEntry);
-            AngleRight.triggers.Add(stopRotateRightEntry);
-
-
-#endif
         }
 
         // Update is called once per frame
@@ -134,7 +100,7 @@ namespace Controllers
 
 #if UNITY_ANDROID
 
-            if (!GameMgr.SwipeControl)
+            if (!GameMgr.TiltControl)
             {
                 if (Input.touchCount > 0)
                 {
@@ -163,7 +129,7 @@ namespace Controllers
                 {
                     float XDelta = CurrentTouchPosition.x - TouchOrigin.x;
 
-                    float ratio = Mathf.Abs(XDelta) / ScreenWidth;
+                    float ratio = Mathf.Abs(XDelta) / (GameConstants.X_MIDDLE_OF_SCREEN * 2);
 
                     float AngleChange = ratio * 180;
 
@@ -180,12 +146,42 @@ namespace Controllers
                     //Debug.LogFormat("Delta: {0}, Ratio: {1}, Angle Change: {2}, Current Angle: {3}.", XDelta, ratio, AngleChange, CurrentAngle);
                     transform.rotation = Quaternion.AngleAxis(CurrentAngle, Vector3.forward);
                 }
-            } else
+            }
+            else
             {
-                CurrentAngle += RotateLeft ? AngleChange : (RotateRight ? -1 * AngleChange : 0);
-                if (CurrentAngle < 0) CurrentAngle = 0;
-                if (CurrentAngle > 180) CurrentAngle = 180;
-                transform.rotation = Quaternion.AngleAxis(CurrentAngle, Vector3.forward);
+                if (Input.touchCount > 0)
+                {
+                    for (int i = 0; i < Input.touchCount; i++)
+                    {
+                        Touch touch = Input.touches[i];
+
+                        if (touch.position.y >= GameConstants.Y_MIDDLE_OF_SCREEN)
+                        {
+                            if (AngleTouch.x < 0)
+                            {
+                                AngleTouch = touch.position;
+                            }
+                            else
+                            {
+                                AngleTouch = -Vector2.one;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (AngleTouch.x > 0)
+                    {
+                        float ChangeAngle = AngleChange * (AngleTouch.x < GameConstants.X_MIDDLE_OF_SCREEN ? 1 : -1);
+                        if (CurrentAngle + ChangeAngle < 0)
+                            CurrentAngle = 0;
+                        else if (CurrentAngle + ChangeAngle > 180)
+                            CurrentAngle = 180;
+                        else
+                            CurrentAngle += ChangeAngle;
+                        transform.rotation = Quaternion.AngleAxis(CurrentAngle, Vector3.forward);
+                    }
+                }
+                AngleTouch = -Vector2.one;
             }
 #else
             var GunPositionInWorld = Camera.main.WorldToScreenPoint(transform.position);
@@ -229,45 +225,6 @@ namespace Controllers
             CanShoot = true;
             yield break;
         }
-
-#if UNITY_ANDROID
-
-        /// <summary>
-        /// Starts  rotating the weapon to the left.
-        /// </summary>
-        private void StartRotateRight(BaseEventData data)
-        {
-            RotateRight = true;
-            if (RotateLeft && RotateRight)
-                RotateLeft = RotateRight = false;
-        }
-
-        /// <summary>
-        /// Starts rotating the weapon to the right.
-        /// </summary>
-        private void StartRotateLeft(BaseEventData data)
-        {
-            RotateLeft = true;
-            if (RotateLeft && RotateRight)
-                RotateLeft = RotateRight = false;
-        }
-        
-        /// <summary>
-        /// Stops the weapon from rotating right.
-        /// </summary>
-        private void StopRotateRight(BaseEventData data)
-        {
-            RotateRight = false;
-        }
-
-        /// <summary>
-        /// Stops the wepaon from rotating left.
-        /// </summary>
-        private void StopRotateLeft(BaseEventData data)
-        {
-            RotateLeft = false;
-        }
-#endif
     }
 
 }
