@@ -118,19 +118,12 @@ namespace Controllers
         /// </summary>
         private void DoAction()
         {
-#if UNITY_ANDROID
+
             if (MoveRight)
                 transform.position = new Vector3(transform.position.x + MovementSpeed, transform.position.y, transform.position.z);
 
             if (MoveLeft)
                 transform.position = new Vector3(transform.position.x - MovementSpeed, transform.position.y, transform.position.z);
-#else 
-            if (MoveRight)
-                transform.position = new Vector3(transform.position.x + MovementSpeed, transform.position.y, transform.position.z);
-
-            if (MoveLeft)
-                transform.position = new Vector3(transform.position.x - MovementSpeed, transform.position.y, transform.position.z);
-#endif 
 
             //Reset all variables to false.
             MoveLeft = MoveRight = false;

@@ -172,7 +172,11 @@ namespace Mgmt
 #endif
                 Toggle toggle = GameObject.Find(GameConstants.UI_NAME_SWIPE_CONTROL).GetComponent<Toggle>();
                 TiltControl = toggle.isOn;
+
+                Button PlayButton = GameObject.Find(GameConstants.UI_NAME_PLAY_BUTTON).GetComponent<Button>();
+                PlayButton.onClick.AddListener(Play);
             }
+
             if (Arena)
             {
                 DefineHealthGradient();
@@ -180,17 +184,8 @@ namespace Mgmt
                 Bounds GroundBounds = GameObject.Find(GameConstants.NAME_GROUND).GetComponent<SpriteRenderer>().bounds;
                 GameConstants.POSITION_Y_GROUND = (GroundBounds.center + GroundBounds.extents).y;
 
-                EnemyWalls = GameObject.FindGameObjectsWithTag(GameConstants.TAG_ENEMY_SPAWN);
-                if (!EnemyWalls[0].name.Equals(GameConstants.NAME_ENEMY_SPAWN + "1"))
-                {
-                    GameObject tmp = EnemyWalls[0];
-                    EnemyWalls[0] = EnemyWalls[1];
-                    EnemyWalls[1] = tmp;
-                }
-
-                EnemyWalls[0].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(-0.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
-                EnemyWalls[1].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(1.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
-
+                ConfigureEnemySpawnPoints();
+                    
                 StartCoroutine("MoveMoveables");
             }
         }
@@ -214,17 +209,32 @@ namespace Mgmt
         }
 
         /// <summary>
+        /// Configures the "EnemyWalls" objects, which indicate spawn and destruction of an enemy.
+        /// </summary>
+        private void ConfigureEnemySpawnPoints()
+        {
+            EnemyWalls = GameObject.FindGameObjectsWithTag(GameConstants.TAG_ENEMY_SPAWN);
+            if (!EnemyWalls[0].name.Equals(GameConstants.NAME_ENEMY_SPAWN + "1"))
+            {
+                GameObject tmp = EnemyWalls[0];
+                EnemyWalls[0] = EnemyWalls[1];
+                EnemyWalls[1] = tmp;
+            }
+
+            EnemyWalls[0].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(-0.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
+            EnemyWalls[1].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(1.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
+        }
+
+        /// <summary>
         /// Loads the arena level.
         /// </summary>
         public void Play()
         {
-            Debug.Log("Starting Play.");
             if (Menu)
             {
                 SceneManager.LoadScene(GameConstants.LEVEL_NAME_ARENA, LoadSceneMode.Single);
                 return;
             }
-            Debug.Log("Not loading play as it is not menu.");
         }
 
         public void ToggleSwipeControls()
