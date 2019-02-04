@@ -64,12 +64,15 @@ namespace Controllers
 
             if (HP <= 0)
             {
+                GameMgr GameManager = GameObject.Find(GameConstants.NAME_GAME_MANAGER).GetComponent<GameMgr>();
                 if (transform.parent.gameObject.name.Contains(GameConstants.NAME_ENEMY))
                 {
                     GameStatistics.EnemiesDestroyed++;
+                    GameManager.DestroyedEnemy(transform.parent.gameObject.GetComponent<EnemyController>().PointsForDestruction);
                 }
                 if (transform.parent.gameObject.name.Equals(GameConstants.NAME_PLAYER))
                 {
+                    GameManager.SaveState();
                     SceneManager.LoadScene(GameConstants.LEVEL_NAME_MENU, LoadSceneMode.Single);
                 }
                 Destroy(transform.parent.gameObject);

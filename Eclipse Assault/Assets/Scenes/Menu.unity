@@ -296,6 +296,27 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameMgr
       objectReference: {fileID: 0}
+    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
+        type: 3}
+      propertyPath: Enemy
+      value: 
+      objectReference: {fileID: 3221192592711081725, guid: 9d0e5d8970cd47f4e80ab28ae2fffd12,
+        type: 3}
+    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
+        type: 3}
+      propertyPath: TimeBetweenEnemySpawn
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
+        type: 3}
+      propertyPath: UnitsPerMovement
+      value: 0.015625
+      objectReference: {fileID: 0}
+    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
+        type: 3}
+      propertyPath: AndroidButton
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8080207819665913855, guid: d80e303aee51f9f438b6170e0b7cabaa,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -350,22 +371,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
-        type: 3}
-      propertyPath: Enemy
-      value: 
-      objectReference: {fileID: 3221192592711081725, guid: 9d0e5d8970cd47f4e80ab28ae2fffd12,
-        type: 3}
-    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
-        type: 3}
-      propertyPath: TimeBetweenEnemySpawn
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 830550726610029002, guid: d80e303aee51f9f438b6170e0b7cabaa,
-        type: 3}
-      propertyPath: UnitsPerMovement
-      value: 0.015625
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d80e303aee51f9f438b6170e0b7cabaa, type: 3}
@@ -602,7 +607,7 @@ PrefabInstance:
     - target: {fileID: 2787363593913811561, guid: 8c70b263a07021b44a439f82d19b9a48,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2787363593913811561, guid: 8c70b263a07021b44a439f82d19b9a48,
         type: 3}

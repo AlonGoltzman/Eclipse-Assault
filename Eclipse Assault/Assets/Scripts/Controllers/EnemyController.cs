@@ -34,6 +34,11 @@ namespace Controllers
         public float Damage;
 
         /// <summary>
+        /// How many points does the player get for the destruction of this enemy.
+        /// </summary>
+        public int PointsForDestruction;
+
+        /// <summary>
         /// How long until the blimp can actually drop a bomb.
         /// </summary>
         private float RemainingCooldown = 0;
@@ -82,7 +87,13 @@ namespace Controllers
         {
             while (true)
             {
+                //For PC, due to the fact that it is more powerful, the movment speed needs to be reduced.
+                //More power = faster FPS = more physics ticks = faster movement from enemy.
+#if UNITY_STANDALONE
+                transform.position = new Vector3(transform.position.x + MovementSpeed/2, transform.position.y, transform.position.z);
+#else
                 transform.position = new Vector3(transform.position.x + MovementSpeed, transform.position.y, transform.position.z);
+#endif
                 yield return new WaitForSeconds(TimeBetweenMovements);
             }
         }
@@ -94,6 +105,7 @@ namespace Controllers
         {
             if (RemainingCooldown > 0) return;
             GameObject NewBomb = Instantiate(Bomb);
+            NewBomb.name = "Bomb" + name;
             NewBomb.transform.position = ExitPoint.position;
             NewBomb.GetComponent<BombController>().SetDamage(Damage);
             RemainingCooldown = BombCoolDownTime;

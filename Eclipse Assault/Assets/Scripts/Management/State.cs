@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Mgmt
 {
+    [Serializable]
     public class State
     {
 
@@ -40,6 +41,15 @@ namespace Mgmt
             CurrentPoints = currentPoints;
             TotalPoints = totalPoints;
             PurchasedUpgrades = purchasedUpgrades;
+        }
+
+        /// <summary>
+        /// Add points to the state.
+        /// </summary>
+        /// <param name="AddedPoints">Points to add</param>
+        public void AddPoints(int AddedPoints)
+        {
+            CurrentPoints += AddedPoints;
         }
 
         public int Points { get { return CurrentPoints; } }

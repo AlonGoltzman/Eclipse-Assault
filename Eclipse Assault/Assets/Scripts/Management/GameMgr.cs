@@ -31,16 +31,6 @@ namespace Mgmt
         public GameObject Enemy;
 
         /// <summary>
-        /// An on-screen button for android.
-        /// </summary>
-        public GameObject AndroidButton;
-
-        /// <summary>
-        /// An on-screen button for IOS.
-        /// </summary>
-        public GameObject IOSButton;
-
-        /// <summary>
         /// The spawn points for enemies.
         /// </summary>
         public GameObject[] EnemyWalls;
@@ -76,12 +66,24 @@ namespace Mgmt
         /// </summary>
         private bool LevelChanged;
 
+        /// <summary>
+        /// The player's state.
+        /// Contains points and purchased information
+        /// </summary>
+        private State PlayerState;
+
+        /// <summary>
+        /// The text field which indicates how many points the player has.
+        /// </summary>
+        private Text PointsText;
+
         private void Awake()
         {
 
             if (_instance == null)
             {
                 _instance = this;
+                StateSaver.LoadState(out PlayerState);
             }
             else if (_instance != this)
             {
@@ -92,17 +94,26 @@ namespace Mgmt
             DontDestroyOnLoad(gameObject);
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        void Update()
+        private void Update()
         {
             if (Arena)
                 UpdateArena();
         }
 
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            Prepare();
+        }
+
+
+        /// <summary>
+        /// The update function used for the Arena level.
+        /// </summary>
         private void UpdateArena()
         {
             if (TimeSinceLastSpawn <= 0)
@@ -119,9 +130,14 @@ namespace Mgmt
 
                 NewEnemy.name = GameConstants.NAME_ENEMY + GameStatistics.EnemiesCreated++;
                 NewEnemy.transform.position = new Vector3(SpawnWall.transform.position.x + UnitsPerMovement * 3 * (Left ? 1 : -1), Y, 0);
-                NewEnemy.GetComponent<EnemyController>().SetDespawnWall(EnemyWalls[Left ? 1 : 0]);
-                NewEnemy.GetComponent<EnemyController>().SetSpeed(UnitsPerMovement * 1.5f * (Left ? 1 : -1));
-                NewEnemy.GetComponent<EnemyController>().BombCoolDownTime = TimeBetweenBombDrop;
+
+                EnemyController NewEnemyController = NewEnemy.GetComponent<EnemyController>();
+
+                NewEnemyController.SetDespawnWall(EnemyWalls[Left ? 1 : 0]);
+                NewEnemyController.SetSpeed(UnitsPerMovement * 1.5f * (Left ? 1 : -1));
+                NewEnemyController.BombCoolDownTime = TimeBetweenBombDrop;
+                NewEnemyController.PointsForDestruction = (int)Random.Range(0, 50);
+
                 TimeSinceLastSpawn = TimeBetweenEnemySpawn;
             }
             else
@@ -168,12 +184,12 @@ namespace Mgmt
             if (Menu)
             {
 #if !UNITY_ANDROID
-                Destroy(GameObject.Find(GameConstants.UI_NAME_SWIPE_CONTROL));
+                Destroy(GameObject.Find(GameConstants.UI_MENU_NAME_TILT_CONTROL));
 #endif
-                Toggle toggle = GameObject.Find(GameConstants.UI_NAME_SWIPE_CONTROL).GetComponent<Toggle>();
+                Toggle toggle = GameObject.Find(GameConstants.UI_MENU_NAME_TILT_CONTROL).GetComponent<Toggle>();
                 TiltControl = toggle.isOn;
 
-                Button PlayButton = GameObject.Find(GameConstants.UI_NAME_PLAY_BUTTON).GetComponent<Button>();
+                Button PlayButton = GameObject.Find(GameConstants.UI_MENU_NAME_PLAY_BUTTON).GetComponent<Button>();
                 PlayButton.onClick.AddListener(Play);
             }
 
@@ -185,16 +201,18 @@ namespace Mgmt
                 GameConstants.POSITION_Y_GROUND = (GroundBounds.center + GroundBounds.extents).y;
 
                 ConfigureEnemySpawnPoints();
-                    
+
+                ConfigurePointsView();
+
                 StartCoroutine("MoveMoveables");
             }
         }
 
-        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            Prepare();
-        }
 
+
+        /// <summary>
+        /// Defines all the values of the health bar gradient
+        /// </summary>
         private void DefineHealthGradient()
         {
             GradientColorKey[] CKeys = new GradientColorKey[3];
@@ -226,6 +244,15 @@ namespace Mgmt
         }
 
         /// <summary>
+        /// Configures the view indicating how many points the user currently has.
+        /// </summary>
+        public void ConfigurePointsView()
+        {
+            PointsText = GameObject.Find(GameConstants.UI_ARENA_NAME_POINTS).GetComponent<Text>();
+            PointsText.text = string.Format(GameConstants.TEXT_POINTS, PlayerState.Points);
+        }
+
+        /// <summary>
         /// Loads the arena level.
         /// </summary>
         public void Play()
@@ -237,10 +264,31 @@ namespace Mgmt
             }
         }
 
-        public void ToggleSwipeControls()
+        /// <summary>
+        /// Toggles the tilt control if you are in the menu level.
+        /// </summary>
+        public void ToggleTiltControls()
         {
             if (!Menu) return;
             TiltControl = !TiltControl;
+        }
+
+        /// <summary>
+        /// Notifys that an enemy has been destroyed.
+        /// </summary>
+        /// <param name="PointsAdded">How many points is the enemy worth.</param>
+        public void DestroyedEnemy(int PointsAdded)
+        {
+            PlayerState.AddPoints(PointsAdded);
+            PointsText.text = string.Format(GameConstants.TEXT_POINTS, PlayerState.Points);
+        }
+
+        /// <summary>
+        /// Saves the current state, should be used after every time the player dies.
+        /// </summary>
+        public void SaveState()
+        {
+            StateSaver.SaveState(PlayerState);
         }
     }
 
@@ -261,20 +309,21 @@ namespace Mgmt
         public static readonly string NAME_CAMERA_CONTAINER = "CameraContainer";
         public static readonly string NAME_ENEMY_SPAWN = "EnemyWall";
         public static readonly string NAME_ENEMY_SPAWN_CONTAINER = "EnemySpawnContainer";
+        public static readonly string NAME_GAME_MANAGER = "GameMgr";
 
         public static readonly string LEVEL_NAME_MENU = "Menu";
         public static readonly string LEVEL_NAME_ARENA = "Arena";
 
-        public static readonly string UI_NAME_MENU = "UI Menu";
-        public static readonly string UI_NAME_SWIPE_CONTROL = "Swipe Control";
-        public static readonly string UI_NAME_PLAY_BUTTON = "Play Button";
-        public static readonly string UI_NAME_MOVE_RIGHT_BUTTON = "MoveRight";
-        public static readonly string UI_NAME_MOVE_LEFT_BUTTON = "MoveLeft";
-        public static readonly string UI_NAME_ANGLE_RIGHT_BUTTON = "AngleRight";
-        public static readonly string UI_NAME_ANGLE_LEFT_BUTTON = "AngleLeft";
+        public static readonly string UI_MENU_NAME_MENU = "UI Menu";
+        public static readonly string UI_MENU_NAME_TILT_CONTROL = "Tilt Control";
+        public static readonly string UI_MENU_NAME_PLAY_BUTTON = "Play Button";
+
+        public static readonly string UI_ARENA_NAME_POINTS = "Points Text";
 
         public static readonly string TAG_MOVEABLES = "Moveables";
         public static readonly string TAG_ENEMY_SPAWN = "EnemySpawn";
+
+        public static readonly string TEXT_POINTS = "Points:{0}";
 
         public static readonly int SpeedMagnitudeReduction = 25;
 
