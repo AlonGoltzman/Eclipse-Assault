@@ -1,14 +1,11 @@
-﻿using Mgmt;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Controllers
 {
-    public class GunController : MonoBehaviour
+    public abstract class GunController : MonoBehaviour
     {
-
         /// <summary>
         /// The bullet that this gun shoots.
         /// </summary>
@@ -30,19 +27,14 @@ namespace Controllers
         private bool TouchStarted;
 
         /// <summary>
-        /// Can the character shoot.
-        /// </summary>
-        private bool CanShoot = true;
-
-        /// <summary>
         /// The Gun's current angle.
         /// </summary>
-        private float CurrentAngle = 0;
+        protected float CurrentAngle = 0;
 
         /// <summary>
         /// The exit point of the gun.
         /// </summary>
-        private Transform ExitPoint;
+        protected Transform ExitPoint;
 
 #if UNITY_ANDROID
         /// <summary>
@@ -80,7 +72,6 @@ namespace Controllers
         void Start()
         {
             ExitPoint = transform.GetChild(0);
-
         }
 
         // Update is called once per frame
@@ -198,33 +189,8 @@ namespace Controllers
         /// <summary>
         /// Performs the action if needed.
         /// </summary>
-        private void DoAction()
-        {
-            if (CanShoot)
+        public abstract void DoAction();
 
-            {
-                var bullet = Instantiate(Bullet);
-
-                bullet.name = GameConstants.NAME_BULLET_PLAYER + GameStatistics.BulletsShot;
-                GameStatistics.BulletsShot++;
-
-                bullet.transform.position = ExitPoint.position;
-                bullet.transform.rotation = transform.rotation;
-
-                bullet.GetComponent<BulletController>().SetAngle(CurrentAngle);
-                bullet.GetComponent<BulletController>().SetDamage(Damage);
-
-                CanShoot = false;
-                StartCoroutine("WaitForAbilityToShoot");
-            }
-        }
-
-        private IEnumerator WaitForAbilityToShoot()
-        {
-            yield return new WaitForSeconds(TimeBetweenShots);
-            CanShoot = true;
-            yield break;
-        }
     }
 
 }

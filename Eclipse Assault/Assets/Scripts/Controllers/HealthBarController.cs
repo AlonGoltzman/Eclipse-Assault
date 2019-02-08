@@ -57,6 +57,7 @@ namespace Controllers
 
         public void Hit(float Damage)
         {
+            Debug.Log("Hit with " + Damage);
             HP -= Damage;
             float LeftHPPercent = ((InitialHP - HP) / InitialHP);
             HealthBar.transform.localScale = new Vector3(1 - LeftHPPercent, HealthBar.transform.localScale.y, 1);
