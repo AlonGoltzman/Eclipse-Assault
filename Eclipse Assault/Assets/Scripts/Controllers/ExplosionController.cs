@@ -54,8 +54,24 @@ namespace Controllers
         {
             if (collision.gameObject.name.Contains(GameConstants.NAME_PLAYER) && !HitGameObjects.Contains(collision.gameObject.name))
             {
+                SpriteRenderer Renderer = GetComponent<SpriteRenderer>();
+
+                Bounds CurrentBounds = Renderer.bounds;
+                Vector3 Center = CurrentBounds.center;
+                Vector3 HalfSize = CurrentBounds.extents;
+
+                Vector3 HitPosition = new Vector3(0, int.MinValue, 0);
+
+                if (collision.gameObject.transform.position.x > transform.position.x)
+                {
+                    HitPosition.x = Center.x + HalfSize.x;
+                }
+                else
+                {
+                    HitPosition.x = Center.x - HalfSize.x;
+                }
                 HitGameObjects.Add(collision.gameObject.name);
-                collision.gameObject.BroadcastMessage("Hit", Damage);
+                collision.gameObject.BroadcastMessage("DamagedExternal", new object[] { Damage, HitPosition });
             }
         }
     }

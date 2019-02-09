@@ -79,8 +79,8 @@ namespace Controllers
         {
             if (collision.name.Contains(GameConstants.NAME_PLAYER))
             {
-                collision.gameObject.BroadcastMessage("Hit", gameObject);
-
+                collision.gameObject.BroadcastMessage("DamagedExternal", new object[] { Damage, transform.position });
+                Destroy(gameObject);
             }
         }
 

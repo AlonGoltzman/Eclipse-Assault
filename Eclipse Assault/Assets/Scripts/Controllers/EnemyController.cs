@@ -53,6 +53,11 @@ namespace Controllers
         /// </summary>
         private GameObject DespawnWall;
 
+        /// <summary>
+        /// A flag to identify if a particle system to indicate damage can be created.
+        /// </summary>
+        private bool CanCreatePS = true;
+
         // Update is called once per frame
         void Start()
         {
@@ -115,7 +120,10 @@ namespace Controllers
         {
             if (other.gameObject.name.Contains(GameConstants.NAME_BULLET_PLAYER))
             {
-                gameObject.GetComponentInChildren<HealthBarController>().Hit(other.gameObject);
+                float Damage = other.gameObject.GetComponent<ProjectileController>().Damage;
+                Vector2 HitPoint = other.transform.position;
+                Damaged(Damage, HitPoint,false);
+                
             }
         }
 
@@ -127,6 +135,95 @@ namespace Controllers
         public void SetDespawnWall(GameObject gameObject)
         {
             DespawnWall = gameObject;
+        }
+
+        /// <summary>
+        /// Indicates that this entity has been hit as a certain position, causing damage.
+        /// </summary>
+        /// <param name="DamageDone">How much damage was done.</param>
+        /// <param name="HitPosition">Where the hit occurred.</param>
+        /// <param name="ReduceAmount">Should we reduce the amount of particles? Due to laser beam damage</param>
+        private void Damaged(float DamageDone, Vector2 HitPosition, bool ReduceAmount)
+        {
+            //Broadcasts to the healthbar component that damage was done.
+            BroadcastMessage("Hit", DamageDone);
+
+            if (!CanCreatePS) { return; }
+
+            SpriteRenderer Renderer = GetComponent<SpriteRenderer>();
+
+            Bounds Bounds = Renderer.bounds;
+            Vector3 Center = Bounds.center;
+            Vector3 HalfSize = Bounds.extents;
+
+            bool HitOnRight = HitPosition.x >= Center.x + HalfSize.x;
+            bool HitOnLeft = HitPosition.x <= Center.x - HalfSize.x;
+
+            float Angle = 0f;
+
+            if (Center.y - HalfSize.y - HitPosition.y <= 0)
+            {
+                Angle = HitOnLeft ? 135f : (HitOnRight ? -135f : 180f);
+            }
+            else
+            {
+                Angle = HitOnLeft ? 90f : (HitOnRight ? -90f : 0f);
+            }
+
+            if (HitPosition.y < Center.y + HalfSize.y || HitPosition.y > Center.y - HalfSize.y)
+            {
+                HitPosition.y = Center.y + (HalfSize.y * (Center.y < 0 ? 1 : -1));
+            }
+
+            GameObject DamagePSGameObject = Instantiate(GameConstants.PREFAB_DAMAGE_PS);
+            DamagePSGameObject.transform.SetParent(transform);
+            DamagePSGameObject.transform.position = new Vector3(HitPosition.x, HitPosition.y, 0);
+            DamagePSGameObject.transform.rotation = Quaternion.AngleAxis(Angle, Vector3.forward);
+            if (ReduceAmount)
+            {
+                ParticleSystem.EmissionModule Emission= DamagePSGameObject.GetComponent<ParticleSystem>().emission;
+                ParticleSystem.MinMaxCurve OverTime = Emission.rateOverTime;
+                OverTime.constant = 100f;
+            }
+            StartCoroutine("WaitForNewPS");
+            StartCoroutine("DestroyPS", DamagePSGameObject);
+            CanCreatePS = false;
+        }
+
+
+        /// <summary>
+        /// Invokes the damaged function, used for the broadcast method.
+        /// This has a different name in order to provide a different function (using the same name causes an issue).
+        /// </summary>
+        /// <param name="args">the values sent</param>
+        public void DamagedExternal(object[] args)
+        { 
+            float DamageDone = (float)args[0];
+            Vector2 HitPosition = (Vector3)args[1];
+            Damaged(DamageDone, HitPosition, true);
+        }
+
+        /// <summary>
+        /// Destroys a particle system after 1.5 seconds.
+        /// </summary>
+        /// <param name="PS">the particle system to destroy</param>
+        /// <returns></returns>
+        private IEnumerator DestroyPS(GameObject PS)
+        {
+            yield return new WaitForSeconds(1.5f);
+            GameObject.Destroy(PS);
+            yield break;
+        }
+
+        /// <summary>
+        /// Waits until 1 seconds passes in order to allow the creation of a new particle system.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator WaitForNewPS()
+        {
+            yield return new WaitForSeconds(0.5f);
+            CanCreatePS = true;
+            yield break;
         }
     }
 }

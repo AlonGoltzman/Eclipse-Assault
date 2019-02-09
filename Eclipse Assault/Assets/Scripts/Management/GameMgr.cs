@@ -97,6 +97,7 @@ namespace Mgmt
         private void OnEnable()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;
+            GameConstants.PREFAB_DAMAGE_PS = Resources.Load(GameConstants.PREFAB_PATH_DAMAGE_PARTICLE_SYSTEM, typeof(GameObject)) as GameObject;
         }
 
         private void Update()
@@ -325,6 +326,8 @@ namespace Mgmt
 
         public static readonly string TEXT_POINTS = "Points:{0}";
 
+        public static readonly string PREFAB_PATH_DAMAGE_PARTICLE_SYSTEM = "Prefabs/DamageParticleSystem";
+
         public static readonly int SpeedMagnitudeReduction = 25;
 
         public static Gradient HEALTH_BAR_GRADIENT = new Gradient();
@@ -341,6 +344,8 @@ namespace Mgmt
 
         public static float X_MIDDLE_OF_SCREEN = Screen.width / 2;
         public static float Y_MIDDLE_OF_SCREEN = Screen.height / 2;
+
+        public static GameObject PREFAB_DAMAGE_PS;
     }
 
     public static class GameStatistics

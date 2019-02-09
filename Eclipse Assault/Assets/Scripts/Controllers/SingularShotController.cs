@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 namespace Controllers
 {
-    public class CannonController : GunController
+    public class SingularShotController : GunController
     {
         /// <summary>
         /// Can the character shoot.

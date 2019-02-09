@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Controllers
 {
 
-    public class LaserController : GunController
+    public class ConsecutiveShotController : GunController
     {
 
         ///// <summary>
@@ -61,7 +61,7 @@ namespace Controllers
                 GameObject HitEntity = Hits.collider.gameObject;
                 if (HitEntity.name.Contains(GameConstants.NAME_ENEMY))
                 {
-                    HitEntity.BroadcastMessage("Hit", ((float)1 / (float)Damage));
+                    HitEntity.BroadcastMessage("DamagedExternal", new object[] { (float)1 / (float)Damage, Hits.point });
                     LaserBeam.SendMessage("ExpandBeam", new Vector2(Hits.point.x, Hits.point.y));
                 }
             }
