@@ -83,7 +83,7 @@ namespace Mgmt
             if (_instance == null)
             {
                 _instance = this;
-                StateSaver.LoadState(out PlayerState);
+                FileMgr.GetInstance().LoadState(out PlayerState);
             }
             else if (_instance != this)
             {
@@ -192,6 +192,18 @@ namespace Mgmt
 
                 Button PlayButton = GameObject.Find(GameConstants.UI_MENU_NAME_PLAY_BUTTON).GetComponent<Button>();
                 PlayButton.onClick.AddListener(Play);
+
+                Button StoreButton = GameObject.Find(GameConstants.UI_MENU_NAME_STORE_BUTTON).GetComponent<Button>();
+                StoreButton.onClick.AddListener(Store);
+
+#if UNITY_EDITOR
+                Button ResetSave = GameObject.Find(GameConstants.UI_MENU_NAME_RESET_SAVE).GetComponent<Button>();
+                ResetSave.onClick.AddListener(FileMgr.GetInstance().DeleteState);
+                ResetSave.onClick.AddListener(() => { FileMgr.GetInstance().LoadState(out PlayerState); });
+#else 
+                Destory(GameObject.Find(GameConstant.UI_MENU_NAME_RESET_SAVE));
+#endif
+
             }
 
             if (Arena)
@@ -266,6 +278,18 @@ namespace Mgmt
         }
 
         /// <summary>
+        /// Takes a player to the store menu.
+        /// </summary>
+        public void Store()
+        {
+            if (Menu)
+            {
+                SceneManager.LoadScene(GameConstants.LEVEL_NAME_STORE, LoadSceneMode.Additive);
+                return;
+            }
+        }
+
+        /// <summary>
         /// Toggles the tilt control if you are in the menu level.
         /// </summary>
         public void ToggleTiltControls()
@@ -289,64 +313,21 @@ namespace Mgmt
         /// </summary>
         public void SaveState()
         {
-            StateSaver.SaveState(PlayerState);
+            FileMgr.GetInstance().SaveState(PlayerState);
+        }
+
+        /// <summary>
+        /// Checks the current state and determines if a player can purchase an item.
+        /// </summary>
+        /// <param name="Price">The price of the item</param>
+        /// <returns></returns>
+        public bool CanPurchase(int Price)
+        {
+            return PlayerState.Points >= Price;
         }
     }
 
-    public static class GameConstants
-    {
-        public static readonly string BUTTON_SHOOT = "SHOOT";
-        public static readonly string BUTTON_MOVE_RIGHT = "RIGHT";
-        public static readonly string BUTTON_MOVE_LEFT = "LEFT";
-
-        public static readonly string NAME_PLAYER = "Player";
-        public static readonly string NAME_ENEMY = "Blimp";
-        public static readonly string NAME_BULLET_PLAYER = "BulletPlayer";
-        public static readonly string NAME_HEALTH_BAR = "HealthBar";
-        public static readonly string NAME_HEALTH_BAR_CONTAINER = "Bar";
-        public static readonly string NAME_HEALTH_BAR_CONTAINER_SPIRTE = "BarSprite";
-        public static readonly string NAME_GROUND = "Ground";
-        public static readonly string NAME_ENEMY_BOMB_DROP_POINT = "BombDropPoint";
-        public static readonly string NAME_CAMERA_CONTAINER = "CameraContainer";
-        public static readonly string NAME_ENEMY_SPAWN = "EnemyWall";
-        public static readonly string NAME_ENEMY_SPAWN_CONTAINER = "EnemySpawnContainer";
-        public static readonly string NAME_GAME_MANAGER = "GameMgr";
-
-        public static readonly string LEVEL_NAME_MENU = "Menu";
-        public static readonly string LEVEL_NAME_ARENA = "Arena";
-
-        public static readonly string UI_MENU_NAME_MENU = "UI Menu";
-        public static readonly string UI_MENU_NAME_TILT_CONTROL = "Tilt Control";
-        public static readonly string UI_MENU_NAME_PLAY_BUTTON = "Play Button";
-
-        public static readonly string UI_ARENA_NAME_POINTS = "Points Text";
-
-        public static readonly string TAG_MOVEABLES = "Moveables";
-        public static readonly string TAG_ENEMY_SPAWN = "EnemySpawn";
-
-        public static readonly string TEXT_POINTS = "Points:{0}";
-
-        public static readonly string PREFAB_PATH_DAMAGE_PARTICLE_SYSTEM = "Prefabs/DamageParticleSystem";
-
-        public static readonly int SpeedMagnitudeReduction = 25;
-
-        public static Gradient HEALTH_BAR_GRADIENT = new Gradient();
-
-        public static readonly GradientColorKey GREEN = new GradientColorKey(Color.green, 0);
-        public static readonly GradientColorKey YELLOW = new GradientColorKey(new Color(1, 1, 0, 1), 0.5f);
-        public static readonly GradientColorKey RED = new GradientColorKey(Color.red, 1);
-
-        public static readonly GradientAlphaKey ALPHA = new GradientAlphaKey(1, 1);
-
-        public static readonly float PIXELS_PER_UNIT = 100f;
-
-        public static float POSITION_Y_GROUND;
-
-        public static float X_MIDDLE_OF_SCREEN = Screen.width / 2;
-        public static float Y_MIDDLE_OF_SCREEN = Screen.height / 2;
-
-        public static GameObject PREFAB_DAMAGE_PS;
-    }
+    
 
     public static class GameStatistics
     {

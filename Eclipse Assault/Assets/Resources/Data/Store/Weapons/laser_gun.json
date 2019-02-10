@@ -1,0 +1,7 @@
+{
+	"Name":"Laser System",
+	"Description":"An experimental military grade high voltage laser system. The weapon will consume up to 30 KW per activation. At max strength the laser is able to pierce high density armor and detonate explosives mid-air.",
+	"Price":1000,
+	"Damage":0.5,
+	"RateOfFire":0
+}

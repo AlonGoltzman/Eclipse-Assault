@@ -1,0 +1,7 @@
+{
+	"Name":"Cannon Gun",
+	"Description":"A standard 90mm Cannon Gun. Effective at low to medium height. Relatively slow rate of fire. Standard reloading time.",
+	"Price":100,
+	"Damage":10,
+	"RateOfFire":1
+}

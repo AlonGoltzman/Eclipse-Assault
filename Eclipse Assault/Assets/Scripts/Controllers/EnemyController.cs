@@ -156,23 +156,31 @@ namespace Controllers
             Vector3 Center = Bounds.center;
             Vector3 HalfSize = Bounds.extents;
 
+            if (HitPosition.y != int.MinValue)
+            {
+                if (HitPosition.y < Center.y + HalfSize.y && HitPosition.y > Center.y - HalfSize.y)
+                {
+                    HitPosition.y = Center.y + (HalfSize.y * (Center.y < 0 ? 1 : -1));
+                }
+            }
+            else
+            {
+                HitPosition.y = Random.Range(Center.y - (HalfSize.y * 0.2f), Center.y + (HalfSize.y * 0.9f));
+                HitPosition.x += (HitPosition.x < Center.x ? -1 : 1) * HitPosition.x / 100;
+            }
+
             bool HitOnRight = HitPosition.x >= Center.x + HalfSize.x;
             bool HitOnLeft = HitPosition.x <= Center.x - HalfSize.x;
 
             float Angle = 0f;
 
-            if (Center.y - HalfSize.y - HitPosition.y <= 0)
+            if (Center.y - HalfSize.y - HitPosition.y >= 0)
             {
                 Angle = HitOnLeft ? 135f : (HitOnRight ? -135f : 180f);
             }
             else
             {
                 Angle = HitOnLeft ? 90f : (HitOnRight ? -90f : 0f);
-            }
-
-            if (HitPosition.y < Center.y + HalfSize.y || HitPosition.y > Center.y - HalfSize.y)
-            {
-                HitPosition.y = Center.y + (HalfSize.y * (Center.y < 0 ? 1 : -1));
             }
 
             GameObject DamagePSGameObject = Instantiate(GameConstants.PREFAB_DAMAGE_PS);

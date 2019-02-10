@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Bullet: {fileID: 0}
-  Damage: 5
+  Damage: 10
   TimeBetweenShots: 0
 --- !u!1001 &4947041175653024825
 PrefabInstance:

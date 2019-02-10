@@ -16,6 +16,12 @@ namespace Controllers
         public float MovementSpeed;
 
         /// <summary>
+        /// The player's weapon, defined by the state.
+        /// </summary>
+        public GameObject Weapon;
+
+
+        /// <summary>
         /// Input read to move right?
         /// </summary>
         private bool MoveRight = false;
