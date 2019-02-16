@@ -278,7 +278,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 557699091}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 557699092}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3577cc5ff1a57647bc27ad7552a1a6d, type: 3}
@@ -374,12 +374,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d80e303aee51f9f438b6170e0b7cabaa, type: 3}
---- !u!1 &557699092 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8080207819665913854, guid: d80e303aee51f9f438b6170e0b7cabaa,
-    type: 3}
-  m_PrefabInstance: {fileID: 557699091}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1839070132
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,11 +652,21 @@ PrefabInstance:
         type: 3}
       propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 557699092}
+      objectReference: {fileID: 375155808}
     - target: {fileID: 2787363594825196859, guid: 8c70b263a07021b44a439f82d19b9a48,
         type: 3}
       propertyPath: m_IsOn
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2787363594825196859, guid: 8c70b263a07021b44a439f82d19b9a48,
+        type: 3}
+      propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ToggleTiltControls
+      objectReference: {fileID: 0}
+    - target: {fileID: 2787363594825196859, guid: 8c70b263a07021b44a439f82d19b9a48,
+        type: 3}
+      propertyPath: onValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 2787363594825196858, guid: 8c70b263a07021b44a439f82d19b9a48,
         type: 3}
@@ -678,6 +682,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 539721812432346191, guid: 8c70b263a07021b44a439f82d19b9a48,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4148483696478123459, guid: 8c70b263a07021b44a439f82d19b9a48,
+        type: 3}
+      propertyPath: m_Text
+      value: Shop
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c70b263a07021b44a439f82d19b9a48, type: 3}

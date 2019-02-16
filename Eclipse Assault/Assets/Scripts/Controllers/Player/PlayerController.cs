@@ -1,9 +1,6 @@
 ﻿using Mgmt;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -80,36 +77,39 @@ namespace Controllers
         {
 
 #if UNITY_ANDROID
-            if (!GameMgr.TiltControl)
+            if (GameConstants.PREFAB_GAME_MANAGER.TiltControl)
             {
                 MoveRight = Input.acceleration.x > 0.1;
                 MoveLeft = Input.acceleration.x < -0.1;
             }
-            else if (Input.touchCount > 0)
+            else 
             {
-                for (int i = 0; i < Input.touchCount; i++)
+                if (Input.touchCount > 0)
                 {
-                    Touch touch = Input.touches[i];
-
-                    if (touch.position.y < GameConstants.Y_MIDDLE_OF_SCREEN)
+                    for (int i = 0; i < Input.touchCount; i++)
                     {
-                        if (MoveTouch.x < 0)
+                        Touch touch = Input.touches[i];
+
+                        if (touch.position.y < GameConstants.Y_MIDDLE_OF_SCREEN)
                         {
-                            MoveTouch = touch.position;
-                        }
-                        else
-                        {
-                            MoveTouch = -Vector2.one;
-                            break;
+                            if (MoveTouch.x < 0)
+                            {
+                                MoveTouch = touch.position;
+                                break;
+                            }
+                            else
+                            {
+                                MoveTouch = -Vector2.one;
+                            }
                         }
                     }
-                }
 
-                if (MoveTouch.x > 0)
-                {
-                    MoveRight = MoveTouch.x > GameConstants.X_MIDDLE_OF_SCREEN;
-                    MoveLeft = MoveTouch.x <= GameConstants.X_MIDDLE_OF_SCREEN;
-                    MoveTouch = -Vector2.one;
+                    if (MoveTouch.x > 0)
+                    {
+                        MoveRight = MoveTouch.x > GameConstants.X_MIDDLE_OF_SCREEN;
+                        MoveLeft = MoveTouch.x <= GameConstants.X_MIDDLE_OF_SCREEN;
+                        MoveTouch = -Vector2.one;
+                    }
                 }
 
             }

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0acb58ccec364f644876bdfb93f174a1, type: 3}
+  m_Name: Rail Gun
+  m_EditorClassIdentifier: 
+  WeaponGUID: e759c5c8-74b8-40e4-836b-e093cce77a05
+  Price: 1000
+  Purchased: 0
+  DefaultWeapon: 0
+  FireRate: 3
+  DamagePerShot: 2.5
+  Projectile: {fileID: 5002742567146259152, guid: fdb6b356178f24b4a8c9ebe1abc7d18f,
+    type: 3}
+  ConsecutiveShot: 0
+  ItemName: Rail Gun
+  ItemDescription: An electromagnetic railgun system. In order to fit the system onto
+    an armored vehicle the muzzle was reduced, and as a result, in order to retain
+    efficency, the projectiles were reduced as well, to 45mm rounds. The system will
+    propel projectiles to speeds of approx. 2500 meters per second causing lethal
+    damage upon impact.

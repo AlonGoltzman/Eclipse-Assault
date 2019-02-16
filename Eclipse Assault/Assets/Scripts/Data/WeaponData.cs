@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace Data
 {
@@ -11,6 +8,7 @@ namespace Data
     [Serializable]
     public class WeaponData 
     {
+        public string GUID;
         public string Name;
         public string Description;
         public int Price;
@@ -19,7 +17,7 @@ namespace Data
 
         public override string ToString()
         {
-            return string.Format("Name:{0},Price:{1},Damage:{2},Rate Of Fire:{3} per second.\nDescription:{4}", Name, Price, Damage, RateOfFire, Description);
+            return string.Format("GUID:{0},Name:{1},Price:{2},Damage:{3},Rate Of Fire:{4} per second.\nDescription:{5}", GUID,Name, Price, Damage, RateOfFire, Description);
         }
 
         public string AdditionalDetails()

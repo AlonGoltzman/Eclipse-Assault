@@ -1,6 +1,4 @@
-﻿using Data;
-using System.Collections;
-using System.Collections.Generic;
+﻿using ControllerSO;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -15,7 +13,7 @@ namespace Mgmt
 
         public static FileMgr GetInstance()
         {
-            return Instance == null ? new FileMgr() : Instance;
+            return Instance ?? new FileMgr();
         }
 
         private FileMgr()
@@ -24,28 +22,21 @@ namespace Mgmt
         }
 
         /// <summary>
-        /// Loads the weapon data from a file.
-        /// </summary>
-        /// <param name="path">the file of the given data</param>
-        /// <returns></returns>
-        public WeaponData LoadWeaponData(string path)
-        {
-
-            TextAsset json = Resources.Load(path, typeof(TextAsset))as TextAsset;
-
-            WeaponData data = JsonUtility.FromJson<WeaponData>(json.text);
-            return data;
-        }
-
-        /// <summary>
         /// Saves a given state into persistent memory.
         /// </summary>
         /// <param name="State">The state variable</param>
         public void SaveState(State State)
         {
-
             BinaryFormatter BinFormatter = new BinaryFormatter();
-            FileStream Stream = File.Create(Application.persistentDataPath + "/state");
+            FileStream Stream = null;
+            if (File.Exists(Application.persistentDataPath + "/state"))
+            {
+                Stream = File.OpenWrite(Application.persistentDataPath + "/state");
+            }
+            else
+            {
+                Stream = File.Create(Application.persistentDataPath + "/state");
+            }
 
             BinFormatter.Serialize(Stream, State);
             Stream.Close();
@@ -94,6 +85,31 @@ namespace Mgmt
             //TODO: Provide proper fix.
             Debug.LogError("Failed to deserialize file, deleting it.");
             File.Delete(Application.persistentDataPath + "/state");
+        }
+
+        /// <summary>
+        /// Loads a weapon stat according to it's GUID.
+        /// If the GUID is not found then the default weapon is returned.
+        /// </summary>
+        /// <param name="GUID"></param>
+        /// <returns></returns>
+        public WeaponStats LoadWeaponStats(string GUID)
+        {
+            WeaponStats[] WeaponStats = Resources.LoadAll<WeaponStats>(GameConstants.STATS_WEAPONS_PATH);
+            foreach (WeaponStats Stats in WeaponStats)
+            {
+                if (Stats.WeaponGUID.Equals(GUID))
+                {
+                    return Stats;
+                }
+            }
+
+            foreach (WeaponStats Stats in WeaponStats)
+            {
+                if (Stats.DefaultWeapon)
+                    return Stats;
+            }
+            return null;
         }
     }
 }

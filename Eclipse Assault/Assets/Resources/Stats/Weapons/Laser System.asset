@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0acb58ccec364f644876bdfb93f174a1, type: 3}
+  m_Name: Laser System
+  m_EditorClassIdentifier: 
+  WeaponGUID: 7084c83d-e5ab-4339-92ce-852d0a854ed0
+  Price: 500
+  Purchased: 0
+  DefaultWeapon: 0
+  FireRate: 0
+  DamagePerShot: 0.05
+  Projectile: {fileID: 6798966832571888621, guid: c88f1eb2d3018cf47ba1f5e5e0cb8db1,
+    type: 3}
+  ConsecutiveShot: 0
+  ItemName: Laser System
+  ItemDescription: An experimental military grade high voltage laser system. The weapon
+    will consume up to 30 KW per activation. At max strength the laser is able to
+    pierce high density armor and detonate explosives mid-air.

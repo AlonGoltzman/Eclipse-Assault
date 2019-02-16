@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0acb58ccec364f644876bdfb93f174a1, type: 3}
+  m_Name: Cannon Gun
+  m_EditorClassIdentifier: 
+  WeaponGUID: 67d847fd-cacd-454d-a578-1be18ff9dbe9
+  Price: 0
+  Purchased: 0
+  DefaultWeapon: 1
+  FireRate: 1.5
+  DamagePerShot: 10
+  Projectile: {fileID: 5002742567146259152, guid: 3948ca7c3f4761140a992e7e3186b79e,
+    type: 3}
+  ConsecutiveShot: 0
+  ItemName: Cannon Gun
+  ItemDescription: A standard 90mm Cannon Gun. Effective at low to medium height.
+    Relatively slow rate of fire. Standard reloading time.

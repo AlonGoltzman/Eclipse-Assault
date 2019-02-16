@@ -1,7 +1,5 @@
-﻿using Controllers;
-using Mgmt;
+﻿using Mgmt;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Controllers
@@ -123,7 +121,7 @@ namespace Controllers
                 float Damage = other.gameObject.GetComponent<ProjectileController>().Damage;
                 Vector2 HitPoint = other.transform.position;
                 Damaged(Damage, HitPoint,false);
-                
+                Destroy(other.gameObject);
             }
         }
 
@@ -174,7 +172,8 @@ namespace Controllers
 
             float Angle = 0f;
 
-            if (Center.y - HalfSize.y - HitPosition.y >= 0)
+            //https://stackoverflow.com/questions/54711390/specific-if-condition-evaluates-incorrectly/54712333#54712333
+            if ((Center.y - HalfSize.y - HitPosition.y) >= -0.00001f)
             {
                 Angle = HitOnLeft ? 135f : (HitOnRight ? -135f : 180f);
             }

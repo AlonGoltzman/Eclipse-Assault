@@ -1,4 +1,6 @@
 {
+	"Type":"Weapons",,
+	"GUID":"1a6ef0c4-dc5f-4e71-87e2-7a81d985207c",
 	"Name":"Laser System",
 	"Description":"An experimental military grade high voltage laser system. The weapon will consume up to 30 KW per activation. At max strength the laser is able to pierce high density armor and detonate explosives mid-air.",
 	"Price":1000,

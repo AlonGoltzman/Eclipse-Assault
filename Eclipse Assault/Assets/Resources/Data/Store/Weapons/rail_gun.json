@@ -1,4 +1,6 @@
 {
+	"Type":"Weapons",,
+	"GUID":"1a6ef0c4-dc5f-4e71-87e2-7a81d985207c",
 	"Name":"Rail Gun",
 	"Description":"An electromagnetic railgun system. In order to fit the system onto an armored vehicle the muzzle was reduced, and as a result, in order to retain efficency, the projectiles were reduced as well, to 45mm rounds. The system will propel projectiles to speeds of approx. 2500 meters per second causing lethal damage upon impact. ",
 	"Price":500,

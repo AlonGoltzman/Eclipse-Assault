@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Mgmt
 {
@@ -81,9 +76,15 @@ namespace Mgmt
         //=================================================================
         //      Prefabs and GameObjects
         //=================================================================
-        public static readonly string PREFAB_PATH_DAMAGE_PARTICLE_SYSTEM = "Prefabs/DamageParticleSystem";
+        public static readonly string PREFAB_PATH_DAMAGE_PARTICLE_SYSTEM = "Prefabs/Projectiles/DamageParticleSystem";
         public static readonly string PREFAB_PATH_STORE_ITEM_TEMPLATE = "Prefabs/UI Prefabs/Item Template";
+        public static readonly string PREFAB_PATH_ENEMY = "Prefabs/Characters/Enemy";
         public static GameObject PREFAB_DAMAGE_PS;
+        public static readonly string STATS_WEAPONS_PATH = "Stats/Weapons/";
+        public static readonly string STATS_WEAPON_DEFAULT_GUN_PATH = "Stats/Weapons/Cannon Gun";
+        public static readonly string STATS_WEAPON_DEFAULT_GUID = "67d847fd-cacd-454d-a578-1be18ff9dbe9";
+        public static GameMgr PREFAB_GAME_MANAGER;
+        public static Level CURRENT_LEVEL;
 
         //=================================================================
         //      Variables

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Mgmt;
 using UnityEngine;
 
 namespace Controllers
@@ -91,7 +90,7 @@ namespace Controllers
 
 #if UNITY_ANDROID
 
-            if (!GameMgr.TiltControl)
+            if (GameConstants.PREFAB_GAME_MANAGER.TiltControl)
             {
                 if (Input.touchCount > 0)
                 {

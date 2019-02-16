@@ -12,7 +12,6 @@
 //use UNITY_CHANGE3 for unity 5.3 (fix for new SceneManger system  )
 
 using UnityEngine;
-using System.Collections;
 using System.Threading;
 #if UNITY_CHANGE3
 using UnityEngine.SceneManagement;

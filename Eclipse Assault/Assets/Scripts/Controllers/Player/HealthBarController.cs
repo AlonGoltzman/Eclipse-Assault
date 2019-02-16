@@ -1,7 +1,4 @@
-﻿using Controllers;
-using Mgmt;
-using System.Collections;
-using System.Collections.Generic;
+﻿using Mgmt;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -57,7 +54,6 @@ namespace Controllers
 
         public void Hit(float Damage)
         {
-            Debug.Log("Hit with " + Damage);
             HP -= Damage;
             float LeftHPPercent = ((InitialHP - HP) / InitialHP);
             HealthBar.transform.localScale = new Vector3(1 - LeftHPPercent, HealthBar.transform.localScale.y, 1);
@@ -65,15 +61,15 @@ namespace Controllers
 
             if (HP <= 0)
             {
-                GameMgr GameManager = GameObject.Find(GameConstants.NAME_GAME_MANAGER).GetComponent<GameMgr>();
+                LevelArena CurrentLevel = (LevelArena)GameConstants.CURRENT_LEVEL;
                 if (transform.parent.gameObject.name.Contains(GameConstants.NAME_ENEMY))
                 {
                     GameStatistics.EnemiesDestroyed++;
-                    GameManager.DestroyedEnemy(transform.parent.gameObject.GetComponent<EnemyController>().PointsForDestruction);
+                    CurrentLevel.DestroyedEnemy(transform.parent.gameObject.GetComponent<EnemyController>().PointsForDestruction);
                 }
                 if (transform.parent.gameObject.name.Equals(GameConstants.NAME_PLAYER))
                 {
-                    GameManager.SaveState();
+                    CurrentLevel.SaveState();
                     SceneManager.LoadScene(GameConstants.LEVEL_NAME_MENU, LoadSceneMode.Single);
                 }
                 Destroy(transform.parent.gameObject);

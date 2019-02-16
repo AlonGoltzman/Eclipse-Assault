@@ -1,91 +1,95 @@
-﻿using Controllers;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace Mgmt
 {
     public class GameMgr : MonoBehaviour
     {
 
-        /// <summary>
-        /// How many space units are moved per each iteration of the coroutine.
-        /// </summary>
-        public float UnitsPerMovement;
+        ///// <summary>
+        ///// How many space units are moved per each iteration of the coroutine.
+        ///// </summary>
+        //public float UnitsPerMovement;
 
-        /// <summary>
-        /// The time between each movement action
-        /// </summary>
-        public float TimeBetweenMovements;
+        ///// <summary>
+        ///// The time between each movement action
+        ///// </summary>
+        //public float TimeBetweenMovements;
 
-        /// <summary>
-        /// Time between spawn of each enemy.
-        /// </summary>
-        public float TimeBetweenEnemySpawn;
+        ///// <summary>
+        ///// Time between spawn of each enemy.
+        ///// </summary>
+        //public float TimeBetweenEnemySpawn;
 
-        /// <summary>
-        /// The enemy to spawn.
-        /// </summary>
-        public GameObject Enemy;
+        ///// <summary>
+        ///// The enemy to spawn.
+        ///// </summary>
+        //public GameObject Enemy;
 
-        /// <summary>
-        /// The spawn points for enemies.
-        /// </summary>
-        public GameObject[] EnemyWalls;
+        ///// <summary>
+        ///// The spawn points for enemies.
+        ///// </summary>
+        //public GameObject[] EnemyWalls;
 
         /// <summary>
         /// The game manager instance.
         /// </summary>
-        private static GameMgr _instance;
+        private static GameMgr Instance;
 
-        /// <summary>
-        /// Time since the last enemy spawned.
-        /// </summary>
-        private float TimeSinceLastSpawn = 0;
+        ///// <summary>
+        ///// Time since the last enemy spawned.
+        ///// </summary>
+        //private float TimeSinceLastSpawn = 0;
 
-        /// <summary>
-        /// Is the current level the menu level.
-        /// </summary>
-        private bool Menu;
+        ///// <summary>
+        ///// Is the current level the menu level.
+        ///// </summary>
+        //private bool Menu;
 
-        /// <summary>
-        /// Is the current levle the arena level.
-        /// </summary>
-        private bool Arena;
+        ///// <summary>
+        ///// Is the current levle the arena level.
+        ///// </summary>
+        //private bool Arena;
 
         /// <summary>
         /// Is swipe control enabled.
         /// </summary>
         [HideInInspector]
-        public static bool TiltControl;
+        public bool TiltControl;
+
+        ///// <summary>
+        ///// Has the level changed in the prepare method.
+        ///// </summary>
+        //private bool LevelChanged;
+
+        ///// <summary>
+        ///// The player's state.
+        ///// Contains points and purchased information
+        ///// </summary>
+        //private State PlayerState;
+
+        ///// <summary>
+        ///// The text field which indicates how many points the player has.
+        ///// </summary>
+        //private Text PointsText;
 
         /// <summary>
-        /// Has the level changed in the prepare method.
+        /// The current Loaded Level.
         /// </summary>
-        private bool LevelChanged;
+        private Level LoadedLevel;
 
-        /// <summary>
-        /// The player's state.
-        /// Contains points and purchased information
-        /// </summary>
-        private State PlayerState;
-
-        /// <summary>
-        /// The text field which indicates how many points the player has.
-        /// </summary>
-        private Text PointsText;
+        [HideInInspector]
+        public StateInRuntime PlayerState;
 
         private void Awake()
         {
 
-            if (_instance == null)
+            if (Instance == null)
             {
-                _instance = this;
-                FileMgr.GetInstance().LoadState(out PlayerState);
+                Instance = this;
+                GameConstants.PREFAB_GAME_MANAGER = Instance;
             }
-            else if (_instance != this)
+            else if (Instance != this)
             {
                 // Destory this game object if a game manager exists already.
                 Destroy(gameObject);
@@ -100,234 +104,31 @@ namespace Mgmt
             GameConstants.PREFAB_DAMAGE_PS = Resources.Load(GameConstants.PREFAB_PATH_DAMAGE_PARTICLE_SYSTEM, typeof(GameObject)) as GameObject;
         }
 
-        private void Update()
-        {
-            if (Arena)
-                UpdateArena();
-        }
-
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Prepare();
-        }
-
-
-        /// <summary>
-        /// The update function used for the Arena level.
-        /// </summary>
-        private void UpdateArena()
-        {
-            if (TimeSinceLastSpawn <= 0)
+            foreach (Level LevelScript in GetComponents<Level>())
             {
-                GameObject NewEnemy = Instantiate(Enemy);
-
-                bool Left = Random.Range(0, 2) == 0;
-
-                GameObject SpawnWall = EnemyWalls[Left ? 0 : 1];
-
-                float Y = Random.Range(SpawnWall.transform.position.y, SpawnWall.transform.position.y + 1);
-
-                float TimeBetweenBombDrop = Random.Range(1, 4);
-
-                NewEnemy.name = GameConstants.NAME_ENEMY + GameStatistics.EnemiesCreated++;
-                NewEnemy.transform.position = new Vector3(SpawnWall.transform.position.x + UnitsPerMovement * 3 * (Left ? 1 : -1), Y, 0);
-
-                EnemyController NewEnemyController = NewEnemy.GetComponent<EnemyController>();
-
-                NewEnemyController.SetDespawnWall(EnemyWalls[Left ? 1 : 0]);
-                NewEnemyController.SetSpeed(UnitsPerMovement * 1.5f * (Left ? 1 : -1));
-                NewEnemyController.BombCoolDownTime = TimeBetweenBombDrop;
-                NewEnemyController.PointsForDestruction = (int)Random.Range(0, 50);
-
-                TimeSinceLastSpawn = TimeBetweenEnemySpawn;
-            }
-            else
-            {
-                TimeSinceLastSpawn -= Time.deltaTime;
-            }
-        }
-
-        /// <summary>
-        /// Moves all the objects tagged with Moveables a certain amount of units.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator MoveMoveables()
-        {
-            while (true)
-            {
-                var Moveables = GameObject.FindGameObjectsWithTag(GameConstants.TAG_MOVEABLES);
-                foreach (GameObject obj in Moveables)
-                {
-                    obj.transform.position = new Vector3(obj.transform.position.x + UnitsPerMovement, obj.transform.position.y, obj.transform.position.z);
-                }
-                yield return new WaitForSeconds(TimeBetweenMovements);
-            }
-        }
-
-        /// <summary>
-        /// Prepares the game manager according to the loaded level.
-        /// </summary>
-        private void Prepare()
-        {
-            bool LevelIsMenu = SceneManager.GetActiveScene().name.Equals(GameConstants.LEVEL_NAME_MENU);
-            bool LevelIsArena = SceneManager.GetActiveScene().name.Equals(GameConstants.LEVEL_NAME_ARENA);
-
-            LevelChanged = (LevelIsArena && Menu) || (LevelIsMenu && Arena);
-
-            if (!LevelChanged && !Menu && !Arena)
-                LevelChanged = true;
-
-            if (!LevelChanged) return;
-
-            Menu = LevelIsMenu;
-            Arena = LevelIsArena;
-
-            if (Menu)
-            {
-#if !UNITY_ANDROID
-                Destroy(GameObject.Find(GameConstants.UI_MENU_NAME_TILT_CONTROL));
-#endif
-                Toggle toggle = GameObject.Find(GameConstants.UI_MENU_NAME_TILT_CONTROL).GetComponent<Toggle>();
-                TiltControl = toggle.isOn;
-
-                Button PlayButton = GameObject.Find(GameConstants.UI_MENU_NAME_PLAY_BUTTON).GetComponent<Button>();
-                PlayButton.onClick.AddListener(Play);
-
-                Button StoreButton = GameObject.Find(GameConstants.UI_MENU_NAME_STORE_BUTTON).GetComponent<Button>();
-                StoreButton.onClick.AddListener(Store);
-
-#if UNITY_EDITOR
-                Button ResetSave = GameObject.Find(GameConstants.UI_MENU_NAME_RESET_SAVE).GetComponent<Button>();
-                ResetSave.onClick.AddListener(FileMgr.GetInstance().DeleteState);
-                ResetSave.onClick.AddListener(() => { FileMgr.GetInstance().LoadState(out PlayerState); });
-#else 
-                Destory(GameObject.Find(GameConstant.UI_MENU_NAME_RESET_SAVE));
-#endif
-
+                Destroy(LevelScript);
             }
 
-            if (Arena)
+            if (scene.name.Equals(GameConstants.LEVEL_NAME_MENU))
             {
-                DefineHealthGradient();
-
-                Bounds GroundBounds = GameObject.Find(GameConstants.NAME_GROUND).GetComponent<SpriteRenderer>().bounds;
-                GameConstants.POSITION_Y_GROUND = (GroundBounds.center + GroundBounds.extents).y;
-
-                ConfigureEnemySpawnPoints();
-
-                ConfigurePointsView();
-
-                StartCoroutine("MoveMoveables");
+                LoadedLevel = gameObject.AddComponent<LevelMenu>();
             }
-        }
-
-
-
-        /// <summary>
-        /// Defines all the values of the health bar gradient
-        /// </summary>
-        private void DefineHealthGradient()
-        {
-            GradientColorKey[] CKeys = new GradientColorKey[3];
-            CKeys[0] = GameConstants.RED;
-            CKeys[1] = GameConstants.YELLOW;
-            CKeys[2] = GameConstants.GREEN;
-
-            GradientAlphaKey[] AKeys = new GradientAlphaKey[3];
-            AKeys[0] = AKeys[1] = AKeys[2] = GameConstants.ALPHA;
-
-            GameConstants.HEALTH_BAR_GRADIENT.SetKeys(CKeys, AKeys);
-        }
-
-        /// <summary>
-        /// Configures the "EnemyWalls" objects, which indicate spawn and destruction of an enemy.
-        /// </summary>
-        private void ConfigureEnemySpawnPoints()
-        {
-            EnemyWalls = GameObject.FindGameObjectsWithTag(GameConstants.TAG_ENEMY_SPAWN);
-            if (!EnemyWalls[0].name.Equals(GameConstants.NAME_ENEMY_SPAWN + "1"))
+            else if (scene.name.Equals(GameConstants.LEVEL_NAME_STORE))
             {
-                GameObject tmp = EnemyWalls[0];
-                EnemyWalls[0] = EnemyWalls[1];
-                EnemyWalls[1] = tmp;
+                LoadedLevel = gameObject.AddComponent<LevelShop>();
             }
-
-            EnemyWalls[0].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(-0.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
-            EnemyWalls[1].transform.position = new Vector3(Camera.main.ViewportToWorldPoint(new Vector3(1.5f, 0, 10)).x, EnemyWalls[0].transform.position.y, 0);
-        }
-
-        /// <summary>
-        /// Configures the view indicating how many points the user currently has.
-        /// </summary>
-        public void ConfigurePointsView()
-        {
-            PointsText = GameObject.Find(GameConstants.UI_ARENA_NAME_POINTS).GetComponent<Text>();
-            PointsText.text = string.Format(GameConstants.TEXT_POINTS, PlayerState.Points);
-        }
-
-        /// <summary>
-        /// Loads the arena level.
-        /// </summary>
-        public void Play()
-        {
-            if (Menu)
+            else if (scene.name.Equals(GameConstants.LEVEL_NAME_ARENA))
             {
-                SceneManager.LoadScene(GameConstants.LEVEL_NAME_ARENA, LoadSceneMode.Single);
-                return;
+                LoadedLevel = gameObject.AddComponent<LevelArena>();
             }
-        }
-
-        /// <summary>
-        /// Takes a player to the store menu.
-        /// </summary>
-        public void Store()
-        {
-            if (Menu)
-            {
-                SceneManager.LoadScene(GameConstants.LEVEL_NAME_STORE, LoadSceneMode.Additive);
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Toggles the tilt control if you are in the menu level.
-        /// </summary>
-        public void ToggleTiltControls()
-        {
-            if (!Menu) return;
-            TiltControl = !TiltControl;
-        }
-
-        /// <summary>
-        /// Notifys that an enemy has been destroyed.
-        /// </summary>
-        /// <param name="PointsAdded">How many points is the enemy worth.</param>
-        public void DestroyedEnemy(int PointsAdded)
-        {
-            PlayerState.AddPoints(PointsAdded);
-            PointsText.text = string.Format(GameConstants.TEXT_POINTS, PlayerState.Points);
-        }
-
-        /// <summary>
-        /// Saves the current state, should be used after every time the player dies.
-        /// </summary>
-        public void SaveState()
-        {
-            FileMgr.GetInstance().SaveState(PlayerState);
-        }
-
-        /// <summary>
-        /// Checks the current state and determines if a player can purchase an item.
-        /// </summary>
-        /// <param name="Price">The price of the item</param>
-        /// <returns></returns>
-        public bool CanPurchase(int Price)
-        {
-            return PlayerState.Points >= Price;
+            GameConstants.CURRENT_LEVEL = LoadedLevel;
+            LoadedLevel.PlayerState = PlayerState;
         }
     }
 
-    
+
 
     public static class GameStatistics
     {
